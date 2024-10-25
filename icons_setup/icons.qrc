@@ -1,0 +1,12 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource>
+    <file>..\icons_setup\icons\browse.png</file>
+    <file>..\icons_setup\icons\amplitude.png</file>
+    <file>..\icons_setup\icons\frequency.png</file>
+    <file>..\icons_setup\icons\shift.png</file>
+    <file>..\icons_setup\icons\edit.png</file>
+    <file>..\icons_setup\icons\delete.png</file>
+
+  </qresource>
+</RCC>
