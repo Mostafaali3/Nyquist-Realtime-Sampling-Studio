@@ -55,9 +55,22 @@ class MainWindow(QMainWindow):
         #######
         # initializing the viewers
         self.sampling_viewer = Viewer()
+        self.sampling_viewer.setBackground((30, 41, 59))
+        self.sampling_viewer.getAxis('bottom').setPen('w')
+        self.sampling_viewer.getAxis('left').setPen('w') 
         self.reconstruction_viewer = Viewer()
+        self.reconstruction_viewer.setBackground((30, 41, 59))
+        self.reconstruction_viewer.getAxis('bottom').setPen('w')
+        self.reconstruction_viewer.getAxis('left').setPen('w') 
         self.error_viewer = Viewer()
+        self.error_viewer.setBackground((30, 41, 59))
+        self.error_viewer.getAxis('bottom').setPen('w')
+        self.error_viewer.getAxis('left').setPen('w') 
         self.frequency_viewer = Viewer()
+        self.frequency_viewer.setBackground((30, 41, 59))
+        self.frequency_viewer.getAxis('bottom').setPen('w')
+        self.frequency_viewer.getAxis('left').setPen('w') 
+        
         # getting the viewrs frames 
         self.sampling_frame = self.findChild(QFrame, 'frame1')
         self.reconstruction_frame = self.findChild(QFrame, 'frame2')
