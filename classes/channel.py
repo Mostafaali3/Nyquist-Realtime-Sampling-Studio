@@ -1,24 +1,15 @@
 from PyQt5.QtWidgets import QFrame, QPushButton, QLineEdit, QHBoxLayout, QLabel
-
-class Channel(QFrame):
-    def __init__(self, signal:list = [], components:list = [], label:str = "unlinited", noise:list = []):
+import numpy as np 
+class Channel():
+    def __init__(self,signal_x:list = [],  signal_y:list = [], components:list = [], label:str = "unlinited", noise:list = []):
         super().__init__()
         self.__signal_components = components
         self.__label = label
-        self.__signal = signal
+        if not len(signal_x):
+            signal_x = np.linspace(0,20,len(signal_y))
+        self.__signal = [signal_x, signal_y]
         self.__noise = noise
         self.__status = "active" # active hidden or deleted 
-        
-        self.layout = QHBoxLayout()
-        self.setLayout(self.layout)
-        
-        self.show_hide_buttom = QPushButton("show/hide")
-        self.delete_buttom = QPushButton("delete")
-        self.signal_name = QLabel(self.__label)
-        
-        self.layout.addWidget(self.signal_name)
-        self.layout.addWidget(self.delete_buttom)
-        self.layout.addWidget(self.show_hide_buttom)
         
     @property
     def signal(self):

@@ -11,6 +11,6 @@ class PlotController():
         
     def plot(self):
         self.sampling_viewer.clear()
-        self.sampling_viewer.plotItem(self.current_signal.signal)
+        self.sampling_viewer.plotItem(,self.current_signal.signal)
         
     

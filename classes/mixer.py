@@ -1,6 +1,8 @@
 from signalComponent import SignalComponent
 import numpy as np
 import matplotlib.pyplot as plt
+from classes.channel import Channel
+
 class Mixer():
     def __init__(self):
         pass
@@ -13,7 +15,9 @@ class Mixer():
             line = np.linspace(0,20, 1000)
             wave = component.amplitude * np.sin(np.dot(2*np.pi*component.frequency, line) + component.shift)
             final_signal = final_signal + wave
-        return final_signal
+            
+        composed_signal = Channel(line, final_signal, signal_components)
+        return composed_signal
     
     
 mix = Mixer()
