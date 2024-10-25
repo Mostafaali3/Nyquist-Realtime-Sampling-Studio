@@ -3,10 +3,12 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFrame, QVBo
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
-from helper_functions.component_generator import add_component
-from helper_functions.component_generator import delete_component
 from classes.viewer import Viewer
 from classes.signalComponent import SignalComponent
+from helper_functions.component_generator import add_component
+from helper_functions.signal_generator import add_signal
+from helper_functions.component_generator import delete_component
+
 
 
 compile_qrc()
@@ -19,10 +21,14 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Sampling Studio')
         self.setWindowIcon(QIcon('icons_setup\icons\logo.png'))
 
+
         self.components_grid_layout = self.componentsContainerWidget.layout()
         self.number_of_components=0
         self.current_components=[]
         self.current_channles=[]
+
+        # self.components_layout = self.componentsContainerWidget.layout()
+
         # add_component(self.grid_layout, 1)
         # add_component( self.grid_layout, 2)
         # add_component(self.grid_layout, 3)
@@ -34,10 +40,18 @@ class MainWindow(QMainWindow):
         # add_component(self.grid_layout, 9)
         # add_component(self.grid_layout, 10)
 
-        # self.componentDeleteButton1 = self.findChild(QPushButton, "componentDeleteButton1")
-        # self.componentDeleteButton1.clicked.connect(lambda: delete_component(self.grid_layout, 1))
-        
-        
+        # self.signals_layout = self.signalsContainerWidget.layout()
+
+        # add_signal(self.signals_layout, 1)
+        # add_signal(self.signals_layout, 2)
+        # add_signal(self.signals_layout, 3)
+        # add_signal(self.signals_layout, 4)
+        # add_signal(self.signals_layout, 5)
+        # add_signal(self.signals_layout, 6)
+        # add_signal(self.signals_layout, 7)
+
+
+
         #######
         # initializing the viewers
         self.sampling_viewer = Viewer()
@@ -83,8 +97,6 @@ class MainWindow(QMainWindow):
         self.current_components.append(componenet)
         add_component(self.components_grid_layout,self.number_of_components)
         self.number_of_components+=1
-
-        
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

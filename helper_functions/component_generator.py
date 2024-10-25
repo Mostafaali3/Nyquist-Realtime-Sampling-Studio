@@ -4,7 +4,6 @@ from PyQt5.QtGui import QIcon
 components_map = {}
 
 def add_component(grid_layout, number):
-
     edit_icon = QIcon("icons_setup/icons/edit.png")
     delete_icon = QIcon("icons_setup/icons/delete.png")
 
@@ -49,6 +48,7 @@ def add_component(grid_layout, number):
         border: none;
         margin: 0;
     """)
+    delete_button.clicked.connect(lambda: delete_component(grid_layout, number))
 
     # Add widgets to component_buttons_layout
     component_buttons_layout.addSpacerItem(spacer)
@@ -64,6 +64,15 @@ def add_component(grid_layout, number):
     grid_layout.addLayout(component_layout, row_position, 0)
     components_map[number] = component_layout
 
+def clear_layout(layout):
+    if layout is not None:
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+            else:
+                clear_layout(item.layout())
 
 def delete_component(grid_layout, number):
     # Check if the component exists in the map
@@ -71,16 +80,14 @@ def delete_component(grid_layout, number):
         # Get the layout to delete
         component_layout = components_map[number]
 
+        # Clear the layout
+        clear_layout(component_layout)
+
         # Remove the layout from the grid layout
         grid_layout.removeItem(component_layout)
 
-        # Remove all widgets from the layout and delete them
-        for i in reversed(range(component_layout.count())): 
-            widget = component_layout.itemAt(i).widget()
-            if widget is not None:
-                widget.deleteLater()  # Ensure the widget is deleted
-
         # Delete the component layout itself
+        component_layout.setParent(None)
         component_layout.deleteLater()
 
         # Remove the entry from the components_map
@@ -91,4 +98,3 @@ def delete_component(grid_layout, number):
         grid_layout.invalidate()  # Re-layout the grid
     else:
         print(f"Component {number} not found.")
-
