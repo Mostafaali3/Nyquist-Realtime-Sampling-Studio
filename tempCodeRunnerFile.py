@@ -1,1 +1,12 @@
-        # delete_component(self.grid_layout, 2)
+        self.components_layout = self.componentsContainerWidget.layout()
+        
+        add_component(self.components_layout, 1)
+        add_component(self.components_layout, 2)
+        add_component(self.components_layout, 3)
+        add_component(self.components_layout, 4)
+        add_component(self.components_layout, 5)
+        add_component(self.components_layout, 6)
+        add_component(self.components_layout, 7)
+        add_component(self.components_layout, 8)
+        add_component(self.components_layout, 9)
+        add_component(self.components_layout, 10)
