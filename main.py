@@ -1,13 +1,15 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFrame, QVBoxLayout, QLineEdit
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFrame, QVBoxLayout, QLineEdit, QWidget
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
 from classes.viewer import Viewer
+from classes.plotController import PlotController
 from classes.signalComponent import SignalComponent
-from helper_functions.component_generator import add_component
+from helper_functions.component_generator import add_component, clear_layout
 from helper_functions.signal_generator import add_signal
 from helper_functions.component_generator import delete_component
+from classes.mixer import Mixer
 
 
 
@@ -21,11 +23,12 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Sampling Studio')
         self.setWindowIcon(QIcon('icons_setup\icons\logo.png'))
 
-
         self.components_grid_layout = self.componentsContainerWidget.layout()
-        self.number_of_components=0
+        self.components_counter=1
+        self.channles_counter = 1
         self.current_components=[]
         self.current_channles=[]
+        self.current_shown_signal = None
 
         # self.components_layout = self.componentsContainerWidget.layout()
 
@@ -40,7 +43,7 @@ class MainWindow(QMainWindow):
         # add_component(self.grid_layout, 9)
         # add_component(self.grid_layout, 10)
 
-        # self.signals_layout = self.signalsContainerWidget.layout()
+        self.signals_layout = self.signalsContainerWidget.layout()
 
         # add_signal(self.signals_layout, 1)
         # add_signal(self.signals_layout, 2)
@@ -71,6 +74,7 @@ class MainWindow(QMainWindow):
         self.frequency_viewer.getAxis('bottom').setPen('w')
         self.frequency_viewer.getAxis('left').setPen('w') 
         
+        self.controller = PlotController(self.sampling_viewer, self.reconstruction_viewer, self.error_viewer, self.frequency_viewer)
         # getting the viewrs frames 
         self.sampling_frame = self.findChild(QFrame, 'frame1')
         self.reconstruction_frame = self.findChild(QFrame, 'frame2')
@@ -92,8 +96,12 @@ class MainWindow(QMainWindow):
         self.frequency_frame_layout.addWidget(self.frequency_viewer)
         #######
         
+        
         self.add_component_button = self.findChild(QPushButton,'addComponentButton')
         self.add_component_button.clicked.connect(self.add_component)
+        
+        self.add_signal_button = self.findChild(QPushButton,'addSignalButton')
+        self.add_signal_button.clicked.connect(self.add_signal)
         
     def get_components_text(self):
         '''
@@ -106,10 +114,32 @@ class MainWindow(QMainWindow):
         
     def add_component(self):
         amplitude, frequency, shift  = self.get_components_text()
-        componenet = SignalComponent(amplitude, frequency, shift, self.number_of_components+1)
+        componenet = SignalComponent(amplitude, frequency, shift, self.components_counter)
         self.current_components.append(componenet)
-        add_component(self.components_grid_layout,self.number_of_components)
-        self.number_of_components+=1
+        add_component(self.components_grid_layout,self.components_counter)
+        component_delete_button = self.findChild(QPushButton, f'componentDeleteButton{self.components_counter}')
+        component_delete_button.clicked.connect(lambda:self.delete_component(self.components_counter))
+        self.components_counter+=1
+        
+    def delete_component(self, component_index): #loop on the signals and the elements and rearrange the indexing 
+        self.current_components.pop(component_index-2)
+        delete_component(self.components_grid_layout, component_index)
+        
+    def add_signal(self):
+        mixer = Mixer()
+        mixed_signal = mixer.mix_signal(self.current_components)
+        mixed_signal.signal_id = self.channles_counter
+        self.current_channles.append(mixed_signal)
+        add_signal(self.signals_layout, self.channles_counter)
+        self.current_shown_signal = mixed_signal
+        self.controller.set_current_signal(self.current_shown_signal)
+        self.current_components.clear()
+        clear_layout(self.components_grid_layout)
+        self.components_counter = 1
+        self.channles_counter+=1
+        
+    def delete_signal(self):
+        pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
