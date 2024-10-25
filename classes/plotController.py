@@ -1,6 +1,6 @@
 from classes.viewer import Viewer
 from classes.channel import Channel
-class PlotControler():
+class PlotController():
     def __init__(self, sampling_viewer:Viewer, reconstruction_viewer:Viewer, error_viewer:Viewer, frequency_viewer:Viewer, current_signal:Channel):
         self.sampling_viewer = sampling_viewer
         self.reconstruction_viewer = reconstruction_viewer
