@@ -1,13 +1,10 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
 from helper_functions.component_generator import add_component
-from helper_functions.component_generator import delete_component
 from helper_functions.signal_generator import add_signal
-from helper_functions.signal_generator import delete_signal
-from helper_functions.signal_generator import show_hide_signal
 
 
 compile_qrc()
