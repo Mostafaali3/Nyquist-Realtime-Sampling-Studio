@@ -48,7 +48,7 @@ def add_component(grid_layout, number):
         border: none;
         margin: 0;
     """)
-    delete_button.clicked.connect(lambda: delete_component(grid_layout, number))
+    # delete_button.clicked.connect(lambda: delete_component(grid_layout, number))
 
     # Add widgets to component_buttons_layout
     component_buttons_layout.addSpacerItem(spacer)
