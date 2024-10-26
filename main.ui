@@ -1447,7 +1447,7 @@ border:none;
           </property>
           <property name="styleSheet">
            <string notr="true">QFrame{
-background-color: #FAF9F6;
+background-color: #1E293B;
 border-radius: 10px
 }</string>
           </property>
@@ -1501,7 +1501,7 @@ border-radius: 10px
           </property>
           <property name="styleSheet">
            <string notr="true">QFrame{
-background-color: #FAF9F6;
+background-color:#1E293B;
 border-radius: 10px
 }</string>
           </property>
@@ -1555,7 +1555,7 @@ border-radius: 10px
           </property>
           <property name="styleSheet">
            <string notr="true">QFrame{
-background-color: #FAF9F6;
+background-color: #1E293B;
 border-radius: 10px
 }</string>
           </property>
@@ -1609,7 +1609,7 @@ border-radius: 10px
           </property>
           <property name="styleSheet">
            <string notr="true">QFrame{
-background-color: #FAF9F6;
+background-color: #1E293B;
 border-radius: 10px
 }</string>
           </property>
