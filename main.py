@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QFrame, QVBoxLayout, QLineEdit, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QLineEdit, QWidget
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
@@ -10,6 +10,7 @@ from helper_functions.component_generator import add_component, clear_layout
 from helper_functions.signal_generator import add_signal
 from helper_functions.component_generator import delete_component
 from classes.mixer import Mixer
+from copy import copy
 
 
 
@@ -26,7 +27,7 @@ class MainWindow(QMainWindow):
         self.components_grid_layout = self.componentsContainerWidget.layout()
         self.components_counter=1
         self.channles_counter = 1
-        self.current_components=[]
+        self.current_components= {}
         self.current_channles=[]
         self.current_shown_signal = None
 
@@ -115,15 +116,24 @@ class MainWindow(QMainWindow):
     def add_component(self):
         amplitude, frequency, shift  = self.get_components_text()
         componenet = SignalComponent(amplitude, frequency, shift, self.components_counter)
-        self.current_components.append(componenet)
+        self.current_components[self.components_counter] = componenet
         add_component(self.components_grid_layout,self.components_counter)
+        component_label = self.findChild(QLabel, f"componentLabel{self.components_counter}")
+        component_label.setText(componenet.label)
         component_delete_button = self.findChild(QPushButton, f'componentDeleteButton{self.components_counter}')
-        component_delete_button.clicked.connect(lambda:self.delete_component(self.components_counter))
+        current_component_index = copy(self.components_counter)
+        component_delete_button.clicked.connect(lambda:self.delete_component(current_component_index))
         self.components_counter+=1
         
     def delete_component(self, component_index): #loop on the signals and the elements and rearrange the indexing 
-        self.current_components.pop(component_index-2)
+        self.current_components.pop(component_index)
         delete_component(self.components_grid_layout, component_index)
+        
+        # rearrabge the ids after the deletion 
+        # for i, component in enumerate(self.current_components):
+        #     component.component_id = i
+        # for i in range(self.components_grid_layout.rowCount()):
+            
         
     def add_signal(self):
         mixer = Mixer()

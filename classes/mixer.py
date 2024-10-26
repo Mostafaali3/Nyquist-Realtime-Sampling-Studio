@@ -9,9 +9,12 @@ class Mixer():
     
     
     def mix_signal(self, signal_components):
+        '''
+        make sure that the input is dict not list 
+        '''
         final_signal = np.zeros(1000)
         print(len(final_signal))
-        for component in signal_components:
+        for key, component in signal_components.items():
             line = np.linspace(0,20, 1000)
             wave = component.amplitude * np.sin(np.dot(2*np.pi*component.frequency, line) + component.shift)
             final_signal = final_signal + wave

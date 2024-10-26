@@ -6,7 +6,7 @@ class SignalComponent():
         self.__frequency = frequency
         self.__shift = shift
         self.func = func 
-        self.__label = f"amplitude:{self.__amplitude} freq: {self.__frequency} shift: {self.__shift}"
+        self.__label = f"amp: {self.__amplitude} freq: {self.__frequency} shift: {self.__shift}"
         self.__component_id = id
         
         # self.layout = QHBoxLayout()
@@ -36,6 +36,14 @@ class SignalComponent():
     def shift(self):
         return self.__shift
     
+    @property
+    def label(self):
+        return self.__label
+    
+    @property
+    def component_id(self):
+        return self.__component_id
+    
     @amplitude.setter
     def amplitude(self, new_amp):
         self.__amplitude = new_amp
@@ -47,3 +55,12 @@ class SignalComponent():
     @shift.setter
     def shift(self, new_shift):
         self.__shift = new_shift
+        
+    @component_id.setter
+    def component_id(self, new_id):
+        if isinstance(new_id, int):
+            self.__component_id = new_id
+        else:
+            print(f"you cannot set id of type {type(new_id)}")
+        
+    
