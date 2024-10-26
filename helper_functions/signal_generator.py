@@ -40,7 +40,7 @@ def add_signal(grid_layout, number):
         border: none;
         margin: 0;
     """)
-    show_button.clicked.connect(lambda: show_hide_signal(show_button, number))
+    # show_button.clicked.connect(lambda: show_hide_signal(show_button, number))
 
     delete_button = QPushButton()
     delete_button.setIcon(delete_icon)
@@ -51,7 +51,7 @@ def add_signal(grid_layout, number):
         border: none;
         margin: 0;
     """)
-    delete_button.clicked.connect(lambda: delete_signal(grid_layout, number))
+    # delete_button.clicked.connect(lambda: delete_signal(grid_layout, number))
 
     # Add widgets to component_buttons_layout
     signal_buttons_layout.addSpacerItem(spacer)

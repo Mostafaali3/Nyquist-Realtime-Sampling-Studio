@@ -7,7 +7,7 @@ from classes.viewer import Viewer
 from classes.plotController import PlotController
 from classes.signalComponent import SignalComponent
 from helper_functions.component_generator import add_component, clear_layout
-from helper_functions.signal_generator import add_signal
+from helper_functions.signal_generator import add_signal, delete_signal,show_hide_signal
 from helper_functions.component_generator import delete_component
 from classes.mixer import Mixer
 from copy import copy
@@ -26,33 +26,33 @@ class MainWindow(QMainWindow):
 
         self.components_grid_layout = self.componentsContainerWidget.layout()
         self.components_counter=1
-        self.channles_counter = 1
+        self.channels_counter = 1
         self.current_components= {}
-        self.current_channles=[]
-        self.current_shown_signal = None
+        self.current_channles={}
+        self.current_shown_channel = None
 
         # self.components_layout = self.componentsContainerWidget.layout()
 
-        add_component(self.components_grid_layout, 1)
-        add_component( self.components_grid_layout, 2)
-        add_component(self.components_grid_layout, 3)
-        add_component(self.components_grid_layout, 4)
-        add_component(self.components_grid_layout, 5)
-        add_component(self.components_grid_layout, 6)
-        add_component(self.components_grid_layout, 7)
-        add_component(self.components_grid_layout, 8)
-        add_component(self.components_grid_layout, 9)
-        add_component(self.components_grid_layout, 10)
+        # add_component(self.components_grid_layout, 1)
+        # add_component( self.components_grid_layout, 2)
+        # add_component(self.components_grid_layout, 3)
+        # add_component(self.components_grid_layout, 4)
+        # add_component(self.components_grid_layout, 5)
+        # add_component(self.components_grid_layout, 6)
+        # add_component(self.components_grid_layout, 7)
+        # add_component(self.components_grid_layout, 8)
+        # add_component(self.components_grid_layout, 9)
+        # add_component(self.components_grid_layout, 10)
 
         self.signals_layout = self.signalsContainerWidget.layout()
 
-        add_signal(self.signals_layout, 1)
-        add_signal(self.signals_layout, 2)
-        add_signal(self.signals_layout, 3)
-        add_signal(self.signals_layout, 4)
-        add_signal(self.signals_layout, 5)
-        add_signal(self.signals_layout, 6)
-        add_signal(self.signals_layout, 7)
+        # add_signal(self.signals_layout, 1)
+        # add_signal(self.signals_layout, 2)
+        # add_signal(self.signals_layout, 3)
+        # add_signal(self.signals_layout, 4)
+        # add_signal(self.signals_layout, 5)
+        # add_signal(self.signals_layout, 6)
+        # add_signal(self.signals_layout, 7)
 
 
         #######
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
         self.frequency_viewer.getAxis('bottom').setPen('w')
         self.frequency_viewer.getAxis('left').setPen('w') 
         
-        self.controller = PlotController(self.sampling_viewer, self.reconstruction_viewer, self.error_viewer, self.frequency_viewer)
+        self.controller = PlotController(self.sampling_viewer, self.reconstruction_viewer, self.error_viewer, self.frequency_viewer,self.current_channles)
         # getting the viewrs frames 
         self.sampling_frame = self.findChild(QFrame, 'frame1')
         self.reconstruction_frame = self.findChild(QFrame, 'frame2')
@@ -127,28 +127,45 @@ class MainWindow(QMainWindow):
     def delete_component(self, component_index): #loop on the signals and the elements and rearrange the indexing 
         self.current_components.pop(component_index)
         delete_component(self.components_grid_layout, component_index)
-        
-        # rearrabge the ids after the deletion 
-        # for i, component in enumerate(self.current_components):
-        #     component.component_id = i
-        # for i in range(self.components_grid_layout.rowCount()):
             
         
     def add_signal(self):
         mixer = Mixer()
-        mixed_signal = mixer.mix_signal(self.current_components)
-        mixed_signal.signal_id = self.channles_counter
-        self.current_channles.append(mixed_signal)
-        add_signal(self.signals_layout, self.channles_counter)
-        self.current_shown_signal = mixed_signal
-        self.controller.set_current_signal(self.current_shown_signal)
-        self.current_components.clear()
-        clear_layout(self.components_grid_layout)
-        self.components_counter = 1
-        self.channles_counter+=1
+        if len(self.current_components):
+            mixed_channel = mixer.mix_signal(self.current_components)
+            current_channel_index = copy(self.channels_counter)
+            mixed_channel.signal_id = current_channel_index
+            self.current_channles[current_channel_index] = mixed_channel
+            add_signal(self.signals_layout, current_channel_index)
+            self.current_shown_channel = mixed_channel
+            self.controller.set_current_channel(self.current_shown_channel)
+            self.current_components.clear()
+            clear_layout(self.components_grid_layout)
+            self.components_counter = 1
+            
+            #activate the delete button
+            signal_delete_button = self.findChild(QPushButton, f"signalDeleteButton{current_channel_index}")
+            signal_delete_button.clicked.connect(lambda:self.delete_signal(current_channel_index))
+            
+            #activate the show hide button 
+            show_hide_button = self.findChild(QPushButton, f"signalShowButton{current_channel_index}")
+            show_hide_button.clicked.connect(lambda:self.show_signal(show_hide_button, current_channel_index))
+            
+            self.channels_counter+=1
         
-    def delete_signal(self):
-        pass
+    def delete_signal(self, current_index):
+        self.current_channles.pop(current_index)#remove the signal from the dict 
+        delete_signal(self.signals_layout, current_index)# remove the wodget of the signal
+        
+    def show_signal(self,current_button, current_index):
+        self.current_shown_channel = self.current_channles[current_index]
+        if self.current_shown_channel.is_hidden:
+            self.current_shown_channel.is_hidden = False
+            for key, channel in self.current_channles.items():
+                if key !=current_index:
+                    channel.is_hidden = True
+            self.controller.set_current_channel(self.current_shown_channel)
+            show_hide_signal(current_button, current_index)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
