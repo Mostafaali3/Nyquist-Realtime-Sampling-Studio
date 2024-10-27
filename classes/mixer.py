@@ -12,14 +12,18 @@ class Mixer():
         '''
         make sure that the input is dict not list 
         '''
+        max_frequency = 0
         final_signal = np.zeros(1000)
         print(len(final_signal))
         for key, component in signal_components.items():
             line = np.linspace(0,20, 1000)
             wave = component.amplitude * np.sin(np.dot(2*np.pi*component.frequency, line) + component.shift)
             final_signal = final_signal + wave
+            if max_frequency < component.frequency:
+                max_frequency = component.frequency
+        print(max_frequency)
             
-        composed_signal = Channel(line, final_signal, signal_components)
+        composed_signal = Channel(line, final_signal, signal_components, max_frequency)
         return composed_signal
     
     

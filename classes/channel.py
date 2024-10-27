@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QFrame, QPushButton, QLineEdit, QHBoxLayout, QLabel
 import numpy as np 
 class Channel():
-    def __init__(self,signal_x:list = [],  signal_y:list = [], components:list = [], label:bool = "unlinited", noise:list = []):
+    def __init__(self,signal_x:list = [],  signal_y:list = [], components:list = [], label:str = "unlinited", noise:list = [], max_frequency = None):
         self.__signal_components = components
         self.__label = label
         if not len(signal_x):
@@ -10,6 +10,7 @@ class Channel():
         self.__noise = noise
         self.is_hidden = False # active hidden or deleted 
         self.signal_id = None
+        self.max_frequency = max_frequency
         
     @property
     def signal(self):
