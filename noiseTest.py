@@ -3,6 +3,7 @@ import numpy as np
 import pyqtgraph as pg
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 
+
 def generate_noise(signal: np.ndarray, snr: float) -> np.ndarray:
     signal_power = np.mean(signal ** 2)
     snr_linear = 10 ** (snr / 10)
