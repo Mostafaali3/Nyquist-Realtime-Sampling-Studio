@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QLineEdit, QWidget , QSlider
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QLineEdit, QWidget , QSlider, QCheckBox
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
@@ -10,7 +10,9 @@ from helper_functions.component_generator import add_component, clear_layout
 from helper_functions.signal_generator import add_signal, delete_signal,show_hide_signal
 from helper_functions.component_generator import delete_component
 from classes.mixer import Mixer
-from copy import copy
+from classes.noiser import Noiser
+from copy import copy, deepcopy
+import math
 
 
 
@@ -109,6 +111,8 @@ class MainWindow(QMainWindow):
         self.nyquist_rate_slider.setMinimum(0)
         self.nyquist_rate_slider.setMaximum(4)
         self.nyquist_rate_slider.setPageStep(1)
+        self.nyquist_slider_current_value_label = self.findChild(QLabel , "nequestRateValueLabel")
+        self.nyquist_rate_slider.valueChanged.connect(self.nyquist_rate_slider_change_effect)
         
         self.sampling_frequency_slider = self.findChild(QSlider , "samplingFrequencySlider")
         self.sampling_frequency_slider.setMinimum(0)
@@ -119,6 +123,23 @@ class MainWindow(QMainWindow):
         self.sampling_frequency_slider_current_value_label = self.findChild(QLabel , "samplingFrequencyValueLabel")
         self.sampling_frequency_max_value_label = self.findChild(QLabel , "label_22")
         self.sampling_frequency_max_value_label.setText("1")
+        
+        #Initialize Noise and SNR
+        self.snr_value_label = self.findChild(QLabel , "SNRValueLabel")
+        self.snr_value_label.setText("1")
+        self.is_noise_added = self.findChild(QCheckBox , "noiseCheckBox")
+        self.is_noise_added.stateChanged.connect(self.snr_checkbox_effect)
+        
+        self.snr_value_slider = self.findChild(QSlider , "noiseSlider")
+        self.snr_value_slider.setMinimum(1)
+        self.snr_value_slider.setMaximum(50)
+        self.snr_value_slider.setPageStep(1)
+        self.snr_value_slider.setValue(1)
+        self.snr_value_slider.setDisabled(True)
+        self.snr_value_slider.valueChanged.connect(self.snr_slider_effect)
+        
+        self.noiser_obj = Noiser()
+        self.snr_value = 1
         
     def get_components_text(self):
         '''
@@ -222,7 +243,40 @@ class MainWindow(QMainWindow):
         self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = new_sampling_frequency
         self.sampling_frequency_slider_current_value_label.setText(str(new_sampling_frequency))
         self.controller.set_current_channel(self.current_shown_channel)
+        self.nyquist_slider_current_value_label.setText(str(math.ceil(new_sampling_frequency / 4)))
+        self.nyquist_rate_slider.blockSignals(True)
+        self.nyquist_rate_slider.setValue(math.ceil(new_sampling_frequency / 4))
+        self.nyquist_rate_slider.blockSignals(False)
+        
+    def nyquist_rate_slider_change_effect(self , new_nyquist_rate):
+        self.nyquist_slider_current_value_label.setText(str(new_nyquist_rate)) 
+        self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = new_nyquist_rate * 4
+        self.sampling_frequency_slider_current_value_label.setText(str(new_nyquist_rate * 4))
+        self.sampling_frequency_slider.blockSignals(True)
+        self.sampling_frequency_slider.setValue(new_nyquist_rate * 4)
+        self.controller.set_current_channel(self.current_shown_channel)
+        self.sampling_frequency_slider.blockSignals(False)
+
+    def snr_checkbox_effect(self , current_state):
+        if (current_state == 2):
+            self.snr_value_slider.setEnabled(True)
+            self.snr_value = self.snr_value_slider.value()
+            generated_noise = self.noiser_obj.generate_noise(self.current_shown_channel , self.snr_value)
+            self.current_shown_channel.noise = list(generated_noise)
+        else:
+            self.current_shown_channel.noise = []
+            self.snr_value_slider.setDisabled(True)
+        self.controller.set_current_channel(self.current_shown_channel)
     
+    def snr_slider_effect(self , new_snr_value):
+        self.snr_value_label.setText(str(new_snr_value))
+        self.snr_value = new_snr_value
+        if(self.is_noise_added.isChecked()):
+            self.snr_checkbox_effect(2)
+        else:
+            self.snr_checkbox_effect(0)
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()

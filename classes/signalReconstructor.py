@@ -218,6 +218,7 @@ class signalReconstructor():
         csv_signal_delta_t = time_diffs_between_two_samples.mean()
         csv_signal_sample_rate = 1 / csv_signal_delta_t
         return csv_signal_sample_rate
+
 ########################################################################################################        
 # def generate_continuous_signal(freq, duration, sampling_rate):
 #         t = np.linspace(0, duration, int(sampling_rate * duration) , endpoint= False)

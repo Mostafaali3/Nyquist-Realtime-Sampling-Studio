@@ -12,14 +12,16 @@ class PlotController():
         self.current_channels_dict = channels_dict
         self.reconstructed_signal_obj = signalReconstructor([] , "Whittaker-Shannon" , 0 , [])
         
-        
     @property
     def current_channel(self):
         return self.__current_channel    
     
     def plot(self):
         self.sampling_viewer.clear()
-        self.sampling_viewer.plot(self.__current_channel.signal[0],self.__current_channel.signal[1])
+        if (len(self.current_channel.noise) != 0):
+            self.sampling_viewer.plot(self.__current_channel.signal[0],self.__current_channel.signal[1] + self.current_channel.noise)
+        else:
+            self.sampling_viewer.plot(self.__current_channel.signal[0],self.__current_channel.signal[1])
         self.sampling_viewer.setLimits(xMin = 0,xMax =self.__current_channel.signal[0][-1])
         self.sampling_viewer.setXRange(0,self.__current_channel.signal[0][-1]/5)
         self.sampling_viewer.setYRange(min(self.__current_channel.signal[1]),max(self.__current_channel.signal[1]))
@@ -29,7 +31,10 @@ class PlotController():
         self.viewer_main_signal_x_values , viewer_main_signal_y_values = self.__current_channel.signal
         self.reconstructed_signal_obj.viewer_main_signal_max_frequency = self.__current_channel.max_frequency
         self.reconstructed_signal_obj.viewer_main_signal_time_points_array = self.viewer_main_signal_x_values
-        self.reconstructed_signal_obj.viewer_main_signal = viewer_main_signal_y_values
+        if(len(self.current_channel.noise) != 0):
+            self.reconstructed_signal_obj.viewer_main_signal = viewer_main_signal_y_values + self.current_channel.noise
+        else:
+            self.reconstructed_signal_obj.viewer_main_signal = viewer_main_signal_y_values
         reconstructed_signal_x_values , reconstructed_signal_y_values = self.reconstructed_signal_obj.reconstruct_main_viewer_signal()
         self.reconstruction_viewer.plot(reconstructed_signal_x_values , reconstructed_signal_y_values)
         self.reconstruction_viewer.setLimits(xMin = 0,xMax =self.__current_channel.signal[0][-1])
@@ -64,7 +69,7 @@ class PlotController():
         self.__current_channel.is_hidden = False
         for key, channel in self.current_channels_dict.items():
             if channel is not self.__current_channel:
-                channel.is_hidden = True 
+                channel.is_hidden = True     
         self.plot()
         self.reconstruct_signal()
         self.reconstruction_error()
