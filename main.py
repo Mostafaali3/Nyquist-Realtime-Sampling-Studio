@@ -127,7 +127,7 @@ class MainWindow(QMainWindow):
         self.sampling_frequency_slider.setMinimum(0)
         self.sampling_frequency_slider.setMaximum(1)
         self.sampling_frequency_slider.setPageStep(1)
-        self.sampling_frequency_slider.valueChanged.connect(self.sampling_frequency_change_effect)
+        self.sampling_frequency_slider.valueChanged.connect(self.sampling_frequency_slider_change_effect)
         
         self.sampling_frequency_slider_current_value_label = self.findChild(QLabel , "samplingFrequencyValueLabel")
         self.sampling_frequency_max_value_label = self.findChild(QLabel , "label_22")
@@ -285,21 +285,21 @@ class MainWindow(QMainWindow):
         self.sampling_frequency_slider.setMaximum(int(self.controller.current_channel.max_frequency) * 4)
         self.sampling_frequency_max_value_label.setText(str(int(self.controller.current_channel.max_frequency) * 4))
 
-    def sampling_frequency_change_effect(self , new_sampling_frequency):
+    def sampling_frequency_slider_change_effect(self , new_sampling_frequency):
         self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = new_sampling_frequency
         self.sampling_frequency_slider_current_value_label.setText(str(new_sampling_frequency))
         self.controller.set_current_channel(self.current_shown_channel)
-        self.nyquist_slider_current_value_label.setText(str(math.ceil(new_sampling_frequency / 4)))
+        self.nyquist_slider_current_value_label.setText(str(math.ceil(new_sampling_frequency * (1 / self.current_shown_channel.max_frequency))))
         self.nyquist_rate_slider.blockSignals(True)
-        self.nyquist_rate_slider.setValue(math.ceil(new_sampling_frequency / 4))
+        self.nyquist_rate_slider.setValue(math.ceil(new_sampling_frequency * (1/ self.current_shown_channel.max_frequency)))
         self.nyquist_rate_slider.blockSignals(False)
         
     def nyquist_rate_slider_change_effect(self , new_nyquist_rate):
         self.nyquist_slider_current_value_label.setText(str(new_nyquist_rate)) 
-        self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = new_nyquist_rate * 4
-        self.sampling_frequency_slider_current_value_label.setText(str(new_nyquist_rate * 4))
+        self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = int(new_nyquist_rate * self.current_shown_channel.max_frequency)
+        self.sampling_frequency_slider_current_value_label.setText(str(int(new_nyquist_rate * self.current_shown_channel.max_frequency)))
         self.sampling_frequency_slider.blockSignals(True)
-        self.sampling_frequency_slider.setValue(new_nyquist_rate * 4)
+        self.sampling_frequency_slider.setValue(int(new_nyquist_rate * self.current_shown_channel.max_frequency))
         self.controller.set_current_channel(self.current_shown_channel)
         self.sampling_frequency_slider.blockSignals(False)
 
