@@ -11,8 +11,11 @@ from helper_functions.component_generator import add_component, clear_layout
 from helper_functions.signal_generator import add_signal, delete_signal,show_hide_signal
 from helper_functions.component_generator import delete_component
 from classes.mixer import Mixer
+from classes.signalReconstructor import signalReconstructor
 from classes.noiser import Noiser
 from classes.channel import Channel
+from scipy.fft import fft, fftfreq
+import numpy as np
 from copy import copy, deepcopy
 import math
 
@@ -240,6 +243,7 @@ class MainWindow(QMainWindow):
             data_x = (data['Time [s]'].iloc[0:1000]).to_numpy()
             data_y = (data[' II'].iloc[0:1000]).to_numpy()
             channel = Channel(signal_x=data_x, signal_y=data_y)
+            channel.max_frequency = self.calculate_3db_frequency(channel)
             
             current_channel_index = copy(self.channels_counter)
             channel.signal_id = current_channel_index
@@ -248,7 +252,7 @@ class MainWindow(QMainWindow):
             add_signal(self.signals_layout, current_channel_index)
             self.current_shown_channel = channel
             self.controller.set_current_channel(self.current_shown_channel)
-            # self.set_sampling_frequency_slider_ranges()
+            self.set_sampling_frequency_slider_ranges()
             
             #activate the delete button
             signal_delete_button = self.findChild(QPushButton, f"signalDeleteButton{current_channel_index}")
@@ -258,7 +262,9 @@ class MainWindow(QMainWindow):
             show_hide_button = self.findChild(QPushButton, f"signalShowButton{current_channel_index}")
             show_hide_button.clicked.connect(lambda:self.show_signal(show_hide_button, current_channel_index))
             
-            # self.real_signal_label = self.findChild(QLabel, f"signalLabel{number}")
+            real_signal_label = self.findChild(QLabel, f"signalLabel{current_channel_index}")
+            real_signal_label.setText(f"Loaded Signal {current_channel_index}")
+            
             
             self.channels_counter+=1
         else:
@@ -317,6 +323,27 @@ class MainWindow(QMainWindow):
             self.snr_checkbox_effect(0)
 
 
+    def calculate_3db_frequency(self,signal:Channel):
+        time = np.array(signal.signal[0])
+        readings = np.array(signal.signal[1])
+        sampling_rate = 1 / (time[1] - time[0])
+
+        # Perform FFT
+        Y = np.fft.fft(readings)
+        freqs = np.fft.fftfreq(len(readings), d=(time[1] - time[0]))
+
+        # Calculate the magnitude spectrum
+        magnitude = np.abs(Y)
+
+        # Find the maximum magnitude and the corresponding 3dB level
+        max_magnitude = np.max(magnitude)
+        db_3_level = max_magnitude * 0.707
+        
+        index_3db = np.where(magnitude <= db_3_level)[0][0]
+        frequency_3db = abs(freqs[index_3db])
+        
+        return db_3_level
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
