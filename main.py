@@ -130,16 +130,44 @@ class MainWindow(QMainWindow):
         return amplitude, frequency, shift
         
     def add_component(self):
-        amplitude, frequency, shift  = self.get_components_text()
-        componenet = SignalComponent(amplitude, frequency, shift, self.components_counter)
-        self.current_components[self.components_counter] = componenet
-        add_component(self.components_grid_layout,self.components_counter)
-        component_label = self.findChild(QLabel, f"componentLabel{self.components_counter}")
-        component_label.setText(componenet.label)
-        component_delete_button = self.findChild(QPushButton, f'componentDeleteButton{self.components_counter}')
-        current_component_index = copy(self.components_counter)
-        component_delete_button.clicked.connect(lambda:self.delete_component(current_component_index))
-        self.components_counter+=1
+        if self.add_component_button.text() == 'Add Component':
+            amplitude, frequency, shift  = self.get_components_text()
+            componenet = SignalComponent(amplitude, frequency, shift, self.components_counter)
+            self.current_components[self.components_counter] = componenet
+            add_component(self.components_grid_layout,self.components_counter)
+            component_label = self.findChild(QLabel, f"componentLabel{self.components_counter}")
+            component_label.setText(componenet.label)
+            component_delete_button = self.findChild(QPushButton, f'componentDeleteButton{self.components_counter}')
+            current_component_index = copy(self.components_counter)
+            component_delete_button.clicked.connect(lambda:self.delete_component(current_component_index))
+            component_edit_button = self.findChild(QPushButton, f"componentEditButton{current_component_index}")
+            component_edit_button.clicked.connect(lambda : self.edit_component_pressed(current_component_index))
+            self.components_counter+=1
+            
+    def edit_component_pressed(self, component_index):
+        component =  self.current_components[component_index]
+        amplitude, frequency, shift =  component.amplitude, component.frequency, component.shift
+        amplitude_textbox = self.findChild(QLineEdit, 'amplitudeInput')
+        amplitude_textbox.setText(str(amplitude))
+        frequency_textbox  = self.findChild(QLineEdit, 'frequencyInput')
+        frequency_textbox.setText(str(frequency))
+        shift_textbox  = self.findChild(QLineEdit, 'shiftInput')
+        shift_textbox.setText(str(shift))
+        self.add_component_button.setText("Edit Component")
+        self.add_component_button.clicked.connect(lambda : self.edit_component(component_index))
+    
+    def edit_component(self, component_index):
+        if self.add_component_button.text() == 'Edit Component':
+            amplitude, frequency, shift = self.get_components_text()
+            self.current_components[component_index].amplitude = amplitude
+            self.current_components[component_index].frequency = frequency
+            self.current_components[component_index].shift = shift
+            component_label = self.findChild(QLabel, f"componentLabel{component_index}")
+            component_label.setText(self.current_components[component_index].label)
+            self.add_component_button.clicked.disconnect()
+            self.add_component_button.setText("Add Component")
+            self.add_component_button.clicked.connect(self.add_component)
+        
         
     def delete_component(self, component_index): #loop on the signals and the elements and rearrange the indexing 
         self.current_components.pop(component_index)
