@@ -1,5 +1,6 @@
+import pandas as pd
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QLineEdit, QWidget , QSlider
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QFileDialog, QLineEdit, QWidget , QSlider
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
@@ -10,6 +11,7 @@ from helper_functions.component_generator import add_component, clear_layout
 from helper_functions.signal_generator import add_signal, delete_signal,show_hide_signal
 from helper_functions.component_generator import delete_component
 from classes.mixer import Mixer
+from classes.channel import Channel
 from copy import copy
 
 
@@ -102,6 +104,10 @@ class MainWindow(QMainWindow):
         
         self.add_signal_button = self.findChild(QPushButton,'addSignalButton')
         self.add_signal_button.clicked.connect(self.add_signal)
+        
+        # upload the signal
+        self.upload_signal_button = self.findChild(QPushButton, 'uploadSignalButton')
+        self.upload_signal_button.clicked.connect(self.upload_signal)
         
         
         # Initialize Nyquist Rate and Sampling Frequency Sliders
@@ -202,6 +208,40 @@ class MainWindow(QMainWindow):
     def delete_signal(self, current_index):
         self.current_channles.pop(current_index)#remove the signal from the dict 
         delete_signal(self.signals_layout, current_index)# remove the wodget of the signal
+        
+    def upload_signal(self):
+        '''
+        handles loading the signal
+        '''
+        file_path, _ = QFileDialog.getOpenFileName(self,'Open CSV File', '', 'CSV Files (*.csv);;All Files (*)' )
+        if file_path.endswith('.csv'):
+            data = pd.read_csv(file_path)
+            data_x = (data['Time [s]'].iloc[0:1000]).to_numpy()
+            data_y = (data[' II'].iloc[0:1000]).to_numpy()
+            channel = Channel(signal_x=data_x, signal_y=data_y)
+            
+            current_channel_index = copy(self.channels_counter)
+            channel.signal_id = current_channel_index
+            self.current_channles[current_channel_index] = channel
+
+            add_signal(self.signals_layout, current_channel_index)
+            self.current_shown_channel = channel
+            self.controller.set_current_channel(self.current_shown_channel)
+            # self.set_sampling_frequency_slider_ranges()
+            
+            #activate the delete button
+            signal_delete_button = self.findChild(QPushButton, f"signalDeleteButton{current_channel_index}")
+            signal_delete_button.clicked.connect(lambda:self.delete_signal(current_channel_index))
+            
+            #activate the show hide button 
+            show_hide_button = self.findChild(QPushButton, f"signalShowButton{current_channel_index}")
+            show_hide_button.clicked.connect(lambda:self.show_signal(show_hide_button, current_channel_index))
+            
+            # self.real_signal_label = self.findChild(QLabel, f"signalLabel{number}")
+            
+            self.channels_counter+=1
+        else:
+            self.show_error("the file extention must be a csv file")
         
     def show_signal(self,current_button, current_index):
         self.current_shown_channel = self.current_channles[current_index]
