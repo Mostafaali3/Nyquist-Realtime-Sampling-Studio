@@ -23,7 +23,7 @@ class Mixer():
                 max_frequency = component.frequency
         print(max_frequency)
             
-        composed_signal = Channel(line, final_signal, signal_components, max_frequency)
+        composed_signal = Channel(line, final_signal, signal_components, max_frequency = max_frequency)
         return composed_signal
     
     

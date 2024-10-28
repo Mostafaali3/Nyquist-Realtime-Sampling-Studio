@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QLineEdit, QWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QLineEdit, QWidget , QSlider
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
@@ -103,6 +103,23 @@ class MainWindow(QMainWindow):
         self.add_signal_button = self.findChild(QPushButton,'addSignalButton')
         self.add_signal_button.clicked.connect(self.add_signal)
         
+        
+        # Initialize Nyquist Rate and Sampling Frequency Sliders
+        self.nyquist_rate_slider = self.findChild(QSlider , "nequestRateSlider")
+        self.nyquist_rate_slider.setMinimum(0)
+        self.nyquist_rate_slider.setMaximum(4)
+        self.nyquist_rate_slider.setPageStep(1)
+        
+        self.sampling_frequency_slider = self.findChild(QSlider , "samplingFrequencySlider")
+        self.sampling_frequency_slider.setMinimum(0)
+        self.sampling_frequency_slider.setMaximum(1)
+        self.sampling_frequency_slider.setPageStep(1)
+        self.sampling_frequency_slider.valueChanged.connect(self.sampling_frequency_change_effect)
+        
+        self.sampling_frequency_slider_current_value_label = self.findChild(QLabel , "samplingFrequencyValueLabel")
+        self.sampling_frequency_max_value_label = self.findChild(QLabel , "label_22")
+        self.sampling_frequency_max_value_label.setText("1")
+        
     def get_components_text(self):
         '''
         this function returns three floats that are written in the text lables 
@@ -139,6 +156,7 @@ class MainWindow(QMainWindow):
             add_signal(self.signals_layout, current_channel_index)
             self.current_shown_channel = mixed_channel
             self.controller.set_current_channel(self.current_shown_channel)
+            self.set_sampling_frequency_slider_ranges()
             self.current_components.clear()
             clear_layout(self.components_grid_layout)
             self.components_counter = 1
@@ -166,7 +184,17 @@ class MainWindow(QMainWindow):
                     channel.is_hidden = True
             self.controller.set_current_channel(self.current_shown_channel)
             show_hide_signal(current_button, current_index)
+            self.set_sampling_frequency_slider_ranges()
+            
+    def set_sampling_frequency_slider_ranges(self):
+        self.sampling_frequency_slider.setMaximum(int(self.controller.current_channel.max_frequency) * 4)
+        self.sampling_frequency_max_value_label.setText(str(int(self.controller.current_channel.max_frequency) * 4))
 
+    def sampling_frequency_change_effect(self , new_sampling_frequency):
+        self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = new_sampling_frequency
+        self.sampling_frequency_slider_current_value_label.setText(str(new_sampling_frequency))
+        self.controller.set_current_channel(self.current_shown_channel)
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()

@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from signalComponent import SignalComponent
-from mixer import Mixer
-from channel import Channel
+from classes.channel import Channel
 class signalReconstructor():
     def __init__(   
                     self , 
@@ -67,7 +65,7 @@ class signalReconstructor():
     
     @viewer_main_signal.setter
     def viewer_main_signal(self , new_viewer_main_signal):
-        if isinstance(new_viewer_main_signal , Channel) or isinstance(new_viewer_main_signal , list) :
+        if isinstance(new_viewer_main_signal , Channel) or isinstance(new_viewer_main_signal , list) or isinstance(new_viewer_main_signal , np.ndarray):
             self._viewer_main_signal= new_viewer_main_signal
     
     @signal_reconstruction_sampling_frequency.setter
@@ -139,7 +137,6 @@ class signalReconstructor():
     def sample_viewer_main_signal(self):
         self.viewer_main_signal_time_points_length = len(self.viewer_main_signal_time_points_array)
         self.signal_reconstruction_max_sampling_frequency = 4 * self.viewer_main_signal_max_frequency
-        self.signal_reconstruction_sampling_frequency = (self.viewer_main_signal_max_frequency * 2) + 1  
         self.reconstuction_time_interval = self.viewer_main_signal_time_points_array
         sampled_time_values = np.linspace(0 , int(round(self.viewer_main_signal_time_points_array[-1])) , (int(round(self.viewer_main_signal_time_points_array[-1]) * self.signal_reconstruction_sampling_frequency)) , endpoint= False )
         sampled_signal_values = np.interp(sampled_time_values, self.viewer_main_signal_time_points_array,  self.viewer_main_signal )
@@ -221,32 +218,33 @@ class signalReconstructor():
         csv_signal_delta_t = time_diffs_between_two_samples.mean()
         csv_signal_sample_rate = 1 / csv_signal_delta_t
         return csv_signal_sample_rate
-        
+########################################################################################################        
 # def generate_continuous_signal(freq, duration, sampling_rate):
 #         t = np.linspace(0, duration, int(sampling_rate * duration) , endpoint= False)
 #         signal = np.sin(2 * np.pi * freq * t)
 #         return signal ,t
 # signal , t = generate_continuous_signal(freq= 4, duration=4 , sampling_rate=1000)
 
-def synthetic_mixed_signal():
-    component1 = SignalComponent(2.0 , 1.0 , 0.0 , 1)
-    component2 = SignalComponent(2.0 , 2.0 , 0.0 , 2)
-    component3 = SignalComponent(2.0 , 10.0 , 0.0 , 3)
-    component4 = SignalComponent(10.0 , 24.0 , 0.0 , 4)
-    component5 = SignalComponent(4.0 , 6.0 , 0.0 , 5)
-    components = {
-        'component1': component1,
-        'component2': component2,
-        'component3': component3,
-        'component4': component4,
-        'component5': component5
-    }
-    mixer = Mixer()
-    signal = mixer.mix_signal(components)
-    return signal.signal , signal.signal_components
+# def synthetic_mixed_signal():
+#     component1 = SignalComponent(2.0 , 1.0 , 0.0 , 1)
+#     component2 = SignalComponent(2.0 , 2.0 , 0.0 , 2)
+#     component3 = SignalComponent(2.0 , 10.0 , 0.0 , 3)
+#     component4 = SignalComponent(10.0 , 24.0 , 0.0 , 4)
+#     component5 = SignalComponent(4.0 , 6.0 , 0.0 , 5)
+#     components = {
+#         'component1': component1,
+#         'component2': component2,
+#         'component3': component3,
+#         'component4': component4,
+#         'component5': component5
+#     }
+#     mixer = Mixer()
+#     signal = mixer.mix_signal(components)
+#     print(signal)
+#     return signal.signal , signal.signal_components , signal.max_frequency
 
-[t , signal] , compoenents = synthetic_mixed_signal()
+# t , signal , max_freq = synthetic_mixed_signal()
 # plt.plot(t , signal)
-reconstruction = signalReconstructor(selected_reconstruction_method="Whittaker-Shannon" , viewer_main_signal=signal , viewer_main_signal_max_frequency= 24, viewer_main_signal_time_points_array= t)
-reconstruction.reconstruct_main_viewer_signal()
-reconstruction.calculate_reconstruction_error()
+# reconstruction = signalReconstructor(selected_reconstruction_method="Whittaker-Shannon" , viewer_main_signal=signal , viewer_main_signal_max_frequency= max_freq, viewer_main_signal_time_points_array= t)
+# reconstruction.reconstruct_main_viewer_signal()
+# reconstruction.calculate_reconstruction_error()
