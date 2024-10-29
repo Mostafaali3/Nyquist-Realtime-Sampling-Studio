@@ -8,7 +8,7 @@ from classes.viewer import Viewer
 from classes.plotController import PlotController
 from classes.signalComponent import SignalComponent
 from helper_functions.component_generator import add_component, clear_layout
-from helper_functions.signal_generator import add_signal, delete_signal,show_hide_signal
+from helper_functions.signal_generator import add_signal, delete_signal,show_hide_signal, show_signal, hide_signal
 from helper_functions.component_generator import delete_component
 from classes.mixer import Mixer
 from classes.signalReconstructor import signalReconstructor
@@ -177,6 +177,7 @@ class MainWindow(QMainWindow):
             component_edit_button = self.findChild(QPushButton, f"componentEditButton{current_component_index}")
             component_edit_button.clicked.connect(lambda : self.edit_component_pressed(current_component_index))
             self.components_counter+=1
+            self.clear_textboxes()
             
     def edit_component_pressed(self, component_index):
         component =  self.current_components[component_index]
@@ -189,6 +190,7 @@ class MainWindow(QMainWindow):
         shift_textbox.setText(str(shift))
         self.add_component_button.setText("Edit Component")
         self.add_component_button.clicked.connect(lambda : self.edit_component(component_index))
+        
     
     def edit_component(self, component_index):
         if self.add_component_button.text() == 'Edit Component':
@@ -201,8 +203,17 @@ class MainWindow(QMainWindow):
             self.add_component_button.clicked.disconnect()
             self.add_component_button.setText("Add Component")
             self.add_component_button.clicked.connect(self.add_component)
+            self.clear_textboxes()
         
         
+    def clear_textboxes(self):
+        amplitude_textbox = self.findChild(QLineEdit, 'amplitudeInput')
+        amplitude_textbox.clear()
+        frequency_textbox  = self.findChild(QLineEdit, 'frequencyInput')
+        frequency_textbox.clear()
+        shift_textbox  = self.findChild(QLineEdit, 'shiftInput')
+        shift_textbox.clear()
+    
     def delete_component(self, component_index): #loop on the signals and the elements and rearrange the indexing 
         self.current_components.pop(component_index)
         delete_component(self.components_grid_layout, component_index)
@@ -230,7 +241,7 @@ class MainWindow(QMainWindow):
             #activate the show hide button 
             show_hide_button = self.findChild(QPushButton, f"signalShowButton{current_channel_index}")
             show_hide_button.clicked.connect(lambda:self.show_signal(show_hide_button, current_channel_index))
-            
+            self.clear_textboxes()
             self.channels_counter+=1
         
     def delete_signal(self, current_index):
@@ -243,9 +254,15 @@ class MainWindow(QMainWindow):
                     self.controller.set_current_channel(signal)
                     self.set_sampling_frequency_slider_ranges()
                     break
-                    
+            else:
+                self.controller.clear_all_viewers()
+                self.current_shown_channel = None
+        else:
+            self.current_channles.pop(current_index)#remove the signal from the dict 
+            delete_signal(self.signals_layout, current_index)
+            
         
-        
+    
     def upload_signal(self):
         '''
         handles loading the signal
@@ -256,7 +273,7 @@ class MainWindow(QMainWindow):
             data_x = (data['Time [s]'].iloc[0:1000]).to_numpy()
             data_y = (data[' II'].iloc[0:1000]).to_numpy()
             channel = Channel(signal_x=data_x, signal_y=data_y)
-            channel.max_frequency = self.calculate_3db_frequency(channel)
+            channel.max_frequency = self.calculate_max_frequency(channel)
             
             current_channel_index = copy(self.channels_counter)
             channel.signal_id = current_channel_index
@@ -285,14 +302,23 @@ class MainWindow(QMainWindow):
         
     def show_signal(self,current_button, current_index):
         self.current_shown_channel = self.current_channles[current_index]
-        if self.current_shown_channel.is_hidden:
+        if self.current_shown_channel.is_hidden or None:
             self.current_shown_channel.is_hidden = False
             for key, channel in self.current_channles.items():
                 if key !=current_index:
                     channel.is_hidden = True
+                    button = self.findChild(QPushButton, f"signalShowButton{current_index}")
+                    hide_signal(button, current_index)
             self.controller.set_current_channel(self.current_shown_channel)
-            show_hide_signal(current_button, current_index)
+            show_signal(current_button, current_index)
             self.set_sampling_frequency_slider_ranges()
+        else:
+            self.current_shown_channel.is_hidden = True
+            self.current_shown_channel = None
+            hide_signal(current_button, current_index)
+            self.controller.clear_all_viewers()
+            
+            
             
     def set_sampling_frequency_slider_ranges(self):
         self.sampling_frequency_slider.setMaximum(int(self.controller.current_channel.max_frequency) * 4)
@@ -340,26 +366,38 @@ class MainWindow(QMainWindow):
         self.controller.set_current_channel(self.current_shown_channel)
 
 
-    def calculate_3db_frequency(self,signal:Channel):
+    def calculate_max_frequency(self,signal:Channel):
         time = np.array(signal.signal[0])
         readings = np.array(signal.signal[1])
         sampling_rate = 1 / (time[1] - time[0])
-
-        # Perform FFT
         Y = np.fft.fft(readings)
         freqs = np.fft.fftfreq(len(readings), d=(time[1] - time[0]))
-
-        # Calculate the magnitude spectrum
         magnitude = np.abs(Y)
+        max_frequency = max(freqs)
+        
+        return max_frequency
+    
+    # def calculate_max_frequency(self, signal: Channel):
+    #     time = np.array(signal.signal[0])
+    #     readings = np.array(signal.signal[1])
+    #     sampling_rate = 1 / (time[1] - time[0])
 
-        # Find the maximum magnitude and the corresponding 3dB level
-        max_magnitude = np.max(magnitude)
-        db_3_level = max_magnitude * 0.707
+    #     # Perform FFT
+    #     Y = np.fft.fft(readings)
+    #     freqs = np.fft.fftfreq(len(readings), d=(time[1] - time[0]))
+
+    #     # Calculate the magnitude spectrum
+    #     magnitude = np.abs(Y)
+
+    #     # Find the index of the maximum magnitude
+    #     max_index = np.argmax(magnitude)
         
-        index_3db = np.where(magnitude <= db_3_level)[0][0]
-        frequency_3db = abs(freqs[index_3db])
+    #     # Corresponding frequency with the highest magnitude
+    #     max_frequency = abs(freqs[max_index])
+    #     print(max_frequency)
         
-        return db_3_level
+    #     return max_frequency
+
     
 if __name__ == '__main__':
     app = QApplication(sys.argv)

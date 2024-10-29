@@ -824,7 +824,7 @@ QComboBox QAbstractItemView {
            </property>
            <item>
             <property name="text">
-             <string>Whittaker–Shannon</string>
+             <string>Whittaker Shannon</string>
             </property>
            </item>
            <item>
