@@ -38,7 +38,7 @@ class SignalComponent():
     
     @property
     def label(self):
-        return self.__label
+        return f"amp: {self.__amplitude} freq: {self.__frequency} shift: {self.__shift}"
     
     @property
     def component_id(self):
