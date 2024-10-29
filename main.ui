@@ -205,7 +205,8 @@ margin-bottom: 10px;
              </property>
              <property name="styleSheet">
               <string notr="true">border: none;
-margin: 0;</string>
+margin: 0;
+font-size:14px;</string>
              </property>
              <property name="text">
               <string>Noise</string>
@@ -417,7 +418,7 @@ margin-bottom: 10px;
            <property name="styleSheet">
             <string notr="true">border: none;
 margin: 0;
-</string>
+font-size:14px;</string>
            </property>
            <property name="text">
             <string>Sampling</string>
@@ -523,7 +524,7 @@ margin: 0;</string>
 margin: 0;</string>
                </property>
                <property name="text">
-                <string>1</string>
+                <string>0</string>
                </property>
               </widget>
              </item>
@@ -547,7 +548,7 @@ margin: 0;</string>
               <widget class="QLabel" name="label_18">
                <property name="minimumSize">
                 <size>
-                 <width>20</width>
+                 <width>30</width>
                  <height>20</height>
                 </size>
                </property>
@@ -562,7 +563,7 @@ margin: 0;</string>
 margin: 0;</string>
                </property>
                <property name="text">
-                <string>5</string>
+                <string>4</string>
                </property>
               </widget>
              </item>
@@ -641,7 +642,7 @@ margin: 0;</string>
               <widget class="QLabel" name="samplingFrequencyValueLabel">
                <property name="minimumSize">
                 <size>
-                 <width>20</width>
+                 <width>30</width>
                  <height>20</height>
                 </size>
                </property>
@@ -713,7 +714,7 @@ margin: 0;</string>
               <widget class="QLabel" name="label_22">
                <property name="minimumSize">
                 <size>
-                 <width>20</width>
+                 <width>30</width>
                  <height>20</height>
                 </size>
                </property>
@@ -780,7 +781,8 @@ margin-bottom: 10px;
            </property>
            <property name="styleSheet">
             <string notr="true">border: none;
-margin: 0;</string>
+margin: 0;
+font-size:14px;</string>
            </property>
            <property name="text">
             <string>Reconstruction Methods</string>
@@ -823,6 +825,16 @@ QComboBox QAbstractItemView {
            <item>
             <property name="text">
              <string>Whittaker–Shannon</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Zero Hold</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Lanczos</string>
             </property>
            </item>
           </widget>
@@ -1113,7 +1125,8 @@ font-size: 18px</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">border: none;
-margin-bottom: 10px</string>
+margin-bottom: 10px;
+font-size:14px;</string>
                </property>
                <property name="text">
                 <string>Amplitude:</string>
@@ -1156,7 +1169,8 @@ margin-bottom: 10px</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">border: none;
-margin-bottom: 10px</string>
+margin-bottom: 10px;
+font-size:14px;</string>
                </property>
                <property name="text">
                 <string>Frequency:</string>
@@ -1199,7 +1213,8 @@ margin-bottom: 10px</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">border: none;
-margin-bottom: 10px</string>
+margin-bottom: 10px;
+font-size:14px;</string>
                </property>
                <property name="text">
                 <string>Shift:</string>
@@ -1410,7 +1425,7 @@ QPushButton:hover {
              <x>0</x>
              <y>0</y>
              <width>286</width>
-             <height>269</height>
+             <height>266</height>
             </rect>
            </property>
            <property name="styleSheet">
@@ -1473,6 +1488,9 @@ border-radius: 10px
             <height>25</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">font-size:16px;</string>
+          </property>
           <property name="text">
            <string>Original Signal &amp; Sampled Pointes</string>
           </property>
@@ -1526,6 +1544,9 @@ border-radius: 10px
             <width>16777215</width>
             <height>25</height>
            </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-size:16px;</string>
           </property>
           <property name="text">
            <string>Reconstructed Signal</string>
@@ -1581,6 +1602,9 @@ border-radius: 10px
             <height>25</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">font-size:16px;</string>
+          </property>
           <property name="text">
            <string>Reconstruction Error</string>
           </property>
@@ -1634,6 +1658,9 @@ border-radius: 10px
             <width>16777215</width>
             <height>25</height>
            </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font-size:16px;</string>
           </property>
           <property name="text">
            <string>Frequency Domain</string>

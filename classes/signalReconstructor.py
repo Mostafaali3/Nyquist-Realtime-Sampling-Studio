@@ -14,7 +14,7 @@ class signalReconstructor():
         self._viewer_main_signal = viewer_main_signal
         self._signal_reconstruction_sampling_frequency = 0
         self._signal_reconstruction_nyquist_rate = 0
-        self._selected_reconstruction_method = "First_order"
+        self._selected_reconstruction_method = selected_reconstruction_method
         self.viewer_main_sampled_signal = []
         self._reconstructed_signal = []
         self._signal_reconstruction_error = [],
@@ -142,8 +142,10 @@ class signalReconstructor():
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
         
-        elif (self.selected_reconstruction_method == ""):
-            pass
+        elif (self.selected_reconstruction_method == "Lanczos"):
+            self.reconstructed_signal = self.reconstruct_using_lanczos(
+                self.viewer_main_signal_time_points_array, sampled_signal_values
+            )
         
         elif(self.selected_reconstruction_method == ""):
             pass
@@ -161,8 +163,11 @@ class signalReconstructor():
         Zero-order hold reconstruction method.
         """
         reconstructed_signal = np.zeros_like(reconstruction_time_interval)
-        sampling_period = 1 / self.signal_reconstruction_sampling_frequency
-        
+        if self.signal_reconstruction_sampling_frequency == 0:
+            sampling_period = 1 / (self.signal_reconstruction_sampling_frequency+1)
+        else:
+            sampling_period = 1 / self.signal_reconstruction_sampling_frequency
+            
         # Perform zero-hold reconstruction by holding each sample value constant over the sampling period
         for n, x_n in enumerate(sampled_signal_values):
             # Determine the time range over which the current sample x_n should be held
@@ -183,7 +188,10 @@ class signalReconstructor():
         First-order hold (linear interpolation) reconstruction method.
         """
         reconstructed_signal = np.zeros_like(reconstruction_time_interval)
-        sampling_period = 1 / self.signal_reconstruction_sampling_frequency
+        if self.signal_reconstruction_sampling_frequency == 0:
+            sampling_period = 1 / (self.signal_reconstruction_sampling_frequency+1)
+        else:
+            sampling_period = 1 / self.signal_reconstruction_sampling_frequency
         
         # Iterate over each sample, except the last one
         for n in range(len(sampled_signal_values) - 1):
@@ -235,7 +243,10 @@ class signalReconstructor():
         N = len(self.sampled_signal)
         hamming_window = np.hamming(N)
         sampled_signal_windowed = hamming_window * self.sampled_signal
-        sampled_time = np.arange(0, N / self.signal_reconstruction_sampling_frequency, 1 / self.signal_reconstruction_sampling_frequency)
+        if self.signal_reconstruction_sampling_frequency == 0:
+            sampled_time = np.arange(0, N / (self.signal_reconstruction_sampling_frequency+1), 1 / (self.signal_reconstruction_sampling_frequency+1))
+        else:
+            sampled_time = np.arange(0, N / self.signal_reconstruction_sampling_frequency, 1 / self.signal_reconstruction_sampling_frequency) 
         return np.interp(reconstruction_time, sampled_time, sampled_signal_windowed)
 
     
@@ -250,6 +261,19 @@ class signalReconstructor():
             reconstructed_signal += x_n * np.sinc(sinc_arg) * kaiser_window[n]
         
         return reconstructed_signal
+    
+        
+    def reconstruct_using_lanczos(self,reconstuction_time_interval, sampled_signal_values):
+        reconstructed_signal = np.zeros_like(reconstuction_time_interval)
+        for n, x_n in enumerate(sampled_signal_values):
+            time_diff = (reconstuction_time_interval - n / self.signal_reconstruction_sampling_frequency)
+            sinc_term = np.sinc(time_diff * self.signal_reconstruction_sampling_frequency)
+            lanczos_window = np.sinc(time_diff / 3)
+            reconstructed_signal += x_n * sinc_term * lanczos_window
+        return reconstructed_signal
+    
+    
+    
        
     def sample_viewer_main_signal(self):
         self.viewer_main_signal_time_points_length = len(self.viewer_main_signal_time_points_array)

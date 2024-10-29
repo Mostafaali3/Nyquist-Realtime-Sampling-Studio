@@ -10,7 +10,7 @@ class PlotController():
         self.frequency_viewer = frequency_viewer
         self.__current_channel = current_channel
         self.current_channels_dict = channels_dict
-        self.reconstructed_signal_obj = signalReconstructor([] , "Whittaker-Shannon" , 0 , [])
+        self.reconstructed_signal_obj = signalReconstructor([] , "Lanczos" , 0 , [])
         
     @property
     def current_channel(self):
