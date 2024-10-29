@@ -106,6 +106,22 @@ def delete_signal(grid_layout, number):
         print(f"Component {number} not found.")
 
 
+def show_signal(signal_button, number):
+    hide_icon = QIcon("icons_setup/icons/hide.png")
+
+    if number in is_signal_shown:
+        is_signal_shown[number] = True
+        signal_button.setIcon(hide_icon)
+
+
+def hide_signal(signal_button, number):
+    show_icon = QIcon("icons_setup/icons/show.png")
+
+    if number in is_signal_shown:
+        is_signal_shown[number] = False
+        signal_button.setIcon(show_icon)
+
+
 def show_hide_signal(signal_button, number):
 
     show_icon = QIcon("icons_setup/icons/show.png")
