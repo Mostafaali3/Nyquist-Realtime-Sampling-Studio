@@ -80,5 +80,10 @@ class PlotController():
         self.reconstruction_error()
         self.frequency_domain()
         self.add_sample_points_on_viewer()
-        
     
+    def clear_all_viewers(self):
+        self.sampling_viewer.clear()
+        self.reconstruction_viewer.clear()
+        self.error_viewer.clear()
+        self.frequency_viewer.clear()
+        self.set_current_channel(None)
