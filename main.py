@@ -21,7 +21,7 @@ import math
 
 
 
-compile_qrc()
+# compile_qrc()
 
 from icons_setup.compiledIcons import *
 class MainWindow(QMainWindow):
