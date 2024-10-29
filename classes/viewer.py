@@ -6,5 +6,5 @@ class Viewer(pg.PlotWidget):
         self.__channels = []
         self.setLimits(xMin = 0, xMax = 1000)
         self.setBackground('w')
-        self.showGrid(True, True)
+        self.showGrid(x= True, y= True , alpha = 0.25)
         

@@ -19,9 +19,9 @@ class PlotController():
     def plot(self):
         self.sampling_viewer.clear()
         if (len(self.current_channel.noise) != 0):
-            self.sampling_viewer.plot(self.__current_channel.signal[0],self.__current_channel.signal[1] + self.current_channel.noise)
+            self.sampling_viewer.plot(self.__current_channel.signal[0],self.__current_channel.signal[1] + self.current_channel.noise , pen=pg.mkPen(width=3))
         else:
-            self.sampling_viewer.plot(self.__current_channel.signal[0],self.__current_channel.signal[1])
+            self.sampling_viewer.plot(self.__current_channel.signal[0],self.__current_channel.signal[1] , pen=pg.mkPen(width=3))
         self.sampling_viewer.setLimits(xMin = 0,xMax =self.__current_channel.signal[0][-1])
         self.sampling_viewer.setXRange(0,self.__current_channel.signal[0][-1]/5)
         self.sampling_viewer.setYRange(min(self.__current_channel.signal[1]),max(self.__current_channel.signal[1]))
@@ -36,19 +36,19 @@ class PlotController():
         else:
             self.reconstructed_signal_obj.viewer_main_signal = viewer_main_signal_y_values
         reconstructed_signal_x_values , reconstructed_signal_y_values = self.reconstructed_signal_obj.reconstruct_main_viewer_signal()
-        self.reconstruction_viewer.plot(reconstructed_signal_x_values , reconstructed_signal_y_values)
-        self.reconstruction_viewer.setLimits(xMin = 0,xMax =self.__current_channel.signal[0][-1])
-        self.reconstruction_viewer.setXRange(0,self.__current_channel.signal[0][-1]/5)
-        self.reconstruction_viewer.setYRange(min(self.__current_channel.signal[1]),max(self.__current_channel.signal[1]))
+        self.reconstruction_viewer.plot(reconstructed_signal_x_values , reconstructed_signal_y_values, pen=pg.mkPen(color = 'b' , width=3))
+        self.reconstruction_viewer.setLimits(xMin = 0,xMax =reconstructed_signal_x_values[-1])
+        self.reconstruction_viewer.setXRange(0,(reconstructed_signal_x_values[-1]/5))
+        self.reconstruction_viewer.setYRange(min(reconstructed_signal_y_values),max(reconstructed_signal_y_values))
         
     
     def reconstruction_error(self):
         self.error_viewer.clear()
         viewer_main_signal_reconstruction_error = self.reconstructed_signal_obj.calculate_reconstruction_error()
-        self.error_viewer.plot(self.viewer_main_signal_x_values , viewer_main_signal_reconstruction_error)
-        self.error_viewer.setLimits(xMin = 0,xMax =self.__current_channel.signal[0][-1])
-        self.error_viewer.setXRange(0,self.__current_channel.signal[0][-1]/5)
-        self.error_viewer.setYRange(min(self.__current_channel.signal[1]),max(self.__current_channel.signal[1]))
+        self.error_viewer.plot(self.viewer_main_signal_x_values , viewer_main_signal_reconstruction_error , pen=pg.mkPen(color = 'r' , width=3))
+        self.error_viewer.setLimits(xMin = 0,xMax =self.viewer_main_signal_x_values[-1])
+        self.error_viewer.setXRange(0,self.viewer_main_signal_x_values[-1]/5)
+        self.error_viewer.setYRange(min(viewer_main_signal_reconstruction_error),max(viewer_main_signal_reconstruction_error))
     
     def frequency_domain(self):
         self.frequency_viewer.clear()
@@ -60,7 +60,6 @@ class PlotController():
         self.frequency_viewer.plot(-main_viewer_signal_frequencies - 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
         self.frequency_viewer.plot(main_viewer_signal_frequencies - 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
         self.frequency_viewer.setLimits(xMin = -main_viewer_signal_frequencies[-1]- 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency,xMax =3000)
-        print((main_viewer_signal_frequencies[-1] + 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency))
         self.frequency_viewer.setXRange(-main_viewer_signal_frequencies[-1] - 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency, -(-main_viewer_signal_frequencies[-1] - 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency))
         self.frequency_viewer.setYRange(min(main_viewer_signal_fft_positive_magnitudes),max(main_viewer_signal_fft_positive_magnitudes))
     
