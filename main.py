@@ -230,8 +230,17 @@ class MainWindow(QMainWindow):
             self.channels_counter+=1
         
     def delete_signal(self, current_index):
-        self.current_channles.pop(current_index)#remove the signal from the dict 
-        delete_signal(self.signals_layout, current_index)# remove the wodget of the signal
+        if self.current_channles[current_index] == self.controller.current_channel:
+            self.current_channles.pop(current_index)#remove the signal from the dict 
+            delete_signal(self.signals_layout, current_index)# remove the wodget of the signal
+            if len(self.current_channles):
+                for key, signal in self.current_channles.items():
+                    self.current_shown_channel = signal
+                    self.controller.set_current_channel(signal)
+                    self.set_sampling_frequency_slider_ranges()
+                    break
+                    
+        
         
     def upload_signal(self):
         '''
