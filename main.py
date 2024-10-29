@@ -1,6 +1,6 @@
 import pandas as pd
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QLineEdit, QWidget , QSlider, QCheckBox, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton,QLabel,  QFrame, QVBoxLayout, QLineEdit, QWidget , QSlider, QCheckBox, QFileDialog, QComboBox
 from PyQt5.uic import loadUi
 from PyQt5.QtGui import QIcon
 from helper_functions.compile_qrc import compile_qrc
@@ -149,6 +149,10 @@ class MainWindow(QMainWindow):
         
         self.noiser_obj = Noiser()
         self.snr_value = 1
+        
+        #ComboBox Initialization
+        self.reconstruction_methods_combobox = self.findChild(QComboBox , "reconstructionMehodsComboBox")
+        self.reconstruction_methods_combobox.currentTextChanged.connect(self.reconstruction_method_combobox_change_effect)
         
     def get_components_text(self):
         '''
@@ -330,6 +334,10 @@ class MainWindow(QMainWindow):
             self.snr_checkbox_effect(2)
         else:
             self.snr_checkbox_effect(0)
+
+    def reconstruction_method_combobox_change_effect(self , new_selected_method):
+        self.controller.reconstructed_signal_obj.selected_reconstruction_method = new_selected_method
+        self.controller.set_current_channel(self.current_shown_channel)
 
 
     def calculate_3db_frequency(self,signal:Channel):

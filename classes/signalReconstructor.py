@@ -115,7 +115,7 @@ class signalReconstructor():
             
     def reconstruct_main_viewer_signal(self):
         sampled_time_values , sampled_signal_values  = self.sample_viewer_main_signal() 
-        if (self.selected_reconstruction_method == "Whittaker-Shannon" ):
+        if (self.selected_reconstruction_method == "Whittaker Shannon" ):
             self.reconstructed_signal = self.reconstruct_using_Whittaker_Shannon_formula(self.reconstuction_time_interval , sampled_signal_values )            
             # plt.plot(reconstuction_time_interval, self.reconstructed_signal)        
         elif self.selected_reconstruction_method == "Hann":
@@ -127,7 +127,7 @@ class signalReconstructor():
             self.reconstructed_signal = self.reconstruct_using_hamming(
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
-        elif self.selected_reconstruction_method == "Zero_hold":
+        elif self.selected_reconstruction_method == "Zero Hold":
             self.reconstructed_signal = self.reconstruct_using_zero_hold(
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
@@ -273,8 +273,6 @@ class signalReconstructor():
         return reconstructed_signal
     
     
-    
-       
     def sample_viewer_main_signal(self):
         self.viewer_main_signal_time_points_length = len(self.viewer_main_signal_time_points_array)
         self.signal_reconstruction_max_sampling_frequency = 4 * self.viewer_main_signal_max_frequency
