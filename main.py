@@ -243,7 +243,30 @@ class MainWindow(QMainWindow):
             show_hide_button.clicked.connect(lambda:self.show_signal(show_hide_button, current_channel_index))
             self.clear_textboxes()
             self.channels_counter+=1
+    
+    def make_synthetic_signals_whittaker(self):
+        synthetic_signal_1 = SignalComponent(1, 2, 0 , self.components_counter)
+        synthetic_signal_2 = SignalComponent(1, 6, 0, self.components_counter)
+        self.current_components = dict  ( 
+                                        synthetic_signal_1= synthetic_signal_1,
+                                        synthetic_signal_2= synthetic_signal_2
+                                        )
+        self.add_signal()
+    
+    def make_synthetic_signals_zero_hold(self):
+        synthetic_signal_1 = SignalComponent(5, 1, 0 , self.components_counter)
+        self.current_components = dict  ( 
+                                        synthetic_signal_1= synthetic_signal_1,
+                                        )
+        self.add_signal()
         
+    def make_synthetic_signals_lanczos(self):
+        synthetic_signal_1 = SignalComponent(5, 1, 90 , self.components_counter)
+        self.current_components = dict  ( 
+                                        synthetic_signal_1= synthetic_signal_1,
+                                        )
+        self.add_signal()
+            
     def delete_signal(self, current_index):
         if self.current_channles[current_index] == self.controller.current_channel:
             self.current_channles.pop(current_index)#remove the signal from the dict 
@@ -402,5 +425,8 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
+    window.make_synthetic_signals_whittaker()
+    window.make_synthetic_signals_zero_hold()
+    window.make_synthetic_signals_lanczos()
     window.show()
     sys.exit(app.exec_())
