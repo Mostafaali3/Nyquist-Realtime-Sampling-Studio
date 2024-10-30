@@ -233,6 +233,7 @@ class MainWindow(QMainWindow):
             self.current_components.clear()
             clear_layout(self.components_grid_layout)
             self.components_counter = 1
+            mixed_channel.export_to_csv()
             
             #activate the delete button
             signal_delete_button = self.findChild(QPushButton, f"signalDeleteButton{current_channel_index}")
@@ -253,12 +254,12 @@ class MainWindow(QMainWindow):
                                         )
         self.add_signal()
     
-    def make_synthetic_signals_zero_hold(self):
-        synthetic_signal_1 = SignalComponent(5, 1, 0 , self.components_counter)
-        self.current_components = dict  ( 
-                                        synthetic_signal_1= synthetic_signal_1,
-                                        )
-        self.add_signal()
+    # def make_synthetic_signals_zero_hold(self):
+    #     synthetic_signal_1 = SignalComponent(5, 1, 0 , self.components_counter)
+    #     self.current_components = dict  ( 
+    #                                     synthetic_signal_1= synthetic_signal_1,
+    #                                     )
+    #     self.add_signal()
         
     def make_synthetic_signals_lanczos(self):
         synthetic_signal_1 = SignalComponent(5, 1, 90 , self.components_counter)
@@ -393,12 +394,22 @@ class MainWindow(QMainWindow):
         time = np.array(signal.signal[0])
         readings = np.array(signal.signal[1])
         sampling_rate = 1 / (time[1] - time[0])
-        Y = np.fft.fft(readings)
-        freqs = np.fft.fftfreq(len(readings), d=(time[1] - time[0]))
+        Y = np.fft.rfft(readings)
+        freqs = np.fft.rfftfreq(len(readings), d=(time[1] - time[0]))
         magnitude = np.abs(Y)
-        max_frequency = max(freqs)
+        magnitude = magnitude.tolist()
+        # max_frequency = max(freqs)
+        nonzero_indices = []
+        for i , value in enumerate(magnitude):
+            if i!=len(magnitude) and i!=0:
+                if magnitude[i]>magnitude[i-1] and magnitude[i]>magnitude[i+1]:
+                    nonzero_indices.append(i)
+        nonzero_indices = np.array(nonzero_indices)
+        if nonzero_indices.size > 0:
+            main_viewer_signal_max_frequency_value = freqs[nonzero_indices[-1]]
+            return int(math.ceil(main_viewer_signal_max_frequency_value))
         
-        return max_frequency
+        # return max_frequency
     
     # def calculate_max_frequency(self, signal: Channel):
     #     time = np.array(signal.signal[0])
@@ -426,7 +437,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
     window.make_synthetic_signals_whittaker()
-    window.make_synthetic_signals_zero_hold()
+    # window.make_synthetic_signals_zero_hold()
     window.make_synthetic_signals_lanczos()
     window.show()
     sys.exit(app.exec_())

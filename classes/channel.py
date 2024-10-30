@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QFrame, QPushButton, QLineEdit, QHBoxLayout, QLabel
 import numpy as np 
+import pandas as pd
 class Channel():
     def __init__(self,signal_x:list = [],  signal_y:list = [], components:list = [], label:str = "unlinited", noise:list = [], max_frequency = None):
         self.__signal_components = components
@@ -12,6 +13,15 @@ class Channel():
         self.signal_id = None
         self.max_frequency = max_frequency
         
+        
+    def export_to_csv(self):
+        data_x = np.array(self.__signal[0])
+        data_y = np.array(self.__signal[1])
+        data = np.column_stack((data_x, data_y))
+        data_frame = pd.DataFrame({"Time [s]":data_x, " II":data_y})
+        data_frame.to_csv(f"signal_data_{self.signal_id}.csv", index=False)
+    
+    
     @property
     def signal(self):
         return self.__signal
