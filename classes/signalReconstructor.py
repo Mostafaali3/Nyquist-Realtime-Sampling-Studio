@@ -15,7 +15,7 @@ class signalReconstructor():
         self._viewer_main_signal = viewer_main_signal
         self._signal_reconstruction_sampling_frequency = 0
         self._signal_reconstruction_nyquist_rate = 0
-        self._selected_reconstruction_method = "Hamming"
+        self._selected_reconstruction_method = "sinc_kaiser"
         self.viewer_main_sampled_signal = []
         self._reconstructed_signal = []
         self._signal_reconstruction_error = [],
@@ -148,6 +148,12 @@ class signalReconstructor():
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
         
+        elif (self.selected_reconstruction_method == "sinc_kaiser"):
+            self.reconstructed_signal = self.reconstruct_using_lanczos(
+                self.viewer_main_signal_time_points_array, sampled_signal_values
+            )
+        
+        
         elif(self.selected_reconstruction_method == "Deponacchi"):
             self.reconstructed_signal = self.reconstruct_using_wavelet(
                 self.viewer_main_signal_time_points_array, sampled_signal_values
@@ -214,7 +220,6 @@ class signalReconstructor():
 
 
     def reconstruct_using_hann(self, reconstuction_time_interval, sampled_signal_values):
-        # Reconstruction using Hann window
         reconstructed_signal = np.zeros_like(reconstuction_time_interval)
         signal_fft = np.fft.fft(sampled_signal_values)
 
@@ -222,19 +227,6 @@ class signalReconstructor():
         hamming_window = np.hamming(N)
         windowed_fft = signal_fft * hamming_window  # Element-wise multiplication
         reconstructed_signal = np.fft.ifft(windowed_fft)
-        #         for n in range(len(sampled_signal_values)-1 ):
-        #     if n == 0: pass
-        #     # Calculate the Hamming window coefficient
-        #     # hamming_coeff = 0.54 - 0.46 * np.cos(2 * np.pi * n / ((reconstuction_time_interval - n /self.signal_reconstruction_sampling_frequency ) * self.signal_reconstruction_sampling_frequency))
-        #     # N = len(sampled_signal_values)
-        #     # Reconstruct the signal using the Hamming window
-        #     print(f'shapes of reconstruction: {reconstuction_time_interval.shape} , {n} , {self.signal_reconstruction_sampling_frequency }')
-        #     number_of_points = int((max(reconstuction_time_interval) - n /self.signal_reconstruction_sampling_frequency ) * self.signal_reconstruction_sampling_frequency)
-
-        #     print(f'number of window points: {number_of_points}, value{sampled_signal_values[n] }')
-        #     print(f'x: {sampled_signal_values[10]}')
-        #     hamming_window = np.hamming(number_of_points)
-        #     reconstructed_signal += hamming_window * sampled_signal_values[n] 
         return reconstructed_signal
     
     def reconstruct_using_hamming(self, reconstruction_time, sampled_signal_values):
@@ -262,23 +254,15 @@ class signalReconstructor():
         return reconstructed_signal
         
     def reconstruct_using_kaiser(self, reconstruction_time, sampled_signal_values, beta=8.6):
-        # Initialize the reconstructed signal
         reconstructed_signal = np.zeros_like(reconstruction_time)
-        
-        # Sampling period
         sampling_period = 1 / self.signal_reconstruction_sampling_frequency if self.signal_reconstruction_sampling_frequency > 0 else 1.0
         N = len(sampled_signal_values)
         
         for n, x_n in enumerate(sampled_signal_values):
-            # Define a Hamming window with decreasing size near boundaries
             window_size = max(3, N - abs(n - (N // 2)))
             kaiser_window = np.kaiser(window_size,8.6)
-            
-            # Adjust windowed time shifts based on the sample index
             center_time = n * sampling_period
             window_times = np.linspace(-0.5, 0.5, window_size) * window_size / self.signal_reconstruction_sampling_frequency
-            
-            # Convolve the sample with the Hamming window over valid intervals
             convolution = x_n * kaiser_window
             for i, t_shift in enumerate(window_times):
                 interval_indices = np.where(
@@ -291,6 +275,18 @@ class signalReconstructor():
         
         return reconstructed_signal
 
+
+    def reconstruct_using_sinc_kaiser(self, reconstruction_time, sampled_signal_values, beta=8.6):
+        reconstructed_signal = np.zeros_like(reconstruction_time)
+        sampling_period = 1 / self.signal_reconstruction_sampling_frequency if self.signal_reconstruction_sampling_frequency > 0 else 1.0
+        N = len(sampled_signal_values)
+        kaiser_window = np.kaiser(N, beta)
+        
+        for n, x_n in enumerate(sampled_signal_values):
+            time_diff = reconstruction_time - n * sampling_period
+            sinc_kaiser = np.sinc(time_diff / sampling_period) * kaiser_window[n]
+            reconstructed_signal += x_n * sinc_kaiser
+        return reconstructed_signal
 
         
     def reconstruct_using_lanczos(self,reconstuction_time_interval, sampled_signal_values):
@@ -335,50 +331,7 @@ class signalReconstructor():
             
     def calculate_reconstruction_error(self):
         self.viewer_main_signal_reconstruction_error = self.viewer_main_signal - self.reconstructed_signal
-        # plt.plot( self.viewer_main_signal_time_points_array, self.viewer_main_signal_reconstruction_error)
-        # plt.show()
         return self.viewer_main_signal_reconstruction_error
-
-    ################################
-    # USING MATRIX DOT PRODUCT WAY #
-    ################################
-    # def reconstruct_using_Whittaker_Shannon_formula(self,reconstuction_time_interval, sampled_signal_values, sampled_time_values):
-    #         sinc_matrix = np.sinc((reconstuction_time_interval[: , None] - sampled_time_values) * self.signal_reconstruction_sampling_frequency)
-    #         return np.dot(sinc_matrix,sampled_signal_values)
-    
-    ####################################
-    # OLD FUNCTION BEFORE KNOWING RFFT #
-    ####################################    
-    # def calculate_viewer_main_signal_max_frequency(self):
-    #     if(self.is_loaded_signal):
-    #         self.viewer_main_signal_sampling_rate = self.calcualte_loaded_signal_sample_rate() 
-    #     main_viewer_signal_fft = np.fft.fft(self.viewer_main_signal)
-    #     main_viewer_signal_fft_positive_magnitudes = np.abs(main_viewer_signal_fft[:self.viewer_main_signal_time_points//2])
-    #     # main_viewer_signal_frequencies = np.fft.fftfreq(len(self.viewer_main_signal), self.viewer_main_signal_sampling_rate)
-    #     # Replace up by down
-    #     main_viewer_signal_frequencies = np.fft.fftfreq(self.viewer_main_signal_time_points, 1/9)
-    #     main_viewer_signal_positive_frequencies = main_viewer_signal_frequencies[:self.viewer_main_signal_time_points//2]
-        
-    #     main_viewer_signal_max_frequency_index = np.argmax(main_viewer_signal_fft_positive_magnitudes)
-    #     main_viewer_signal_max_frequency_value = main_viewer_signal_positive_frequencies[main_viewer_signal_max_frequency_index]
-        
-    #     return main_viewer_signal_max_frequency_value
-    
-    # def calculate_viewer_main_signal_max_frequency(self):
-    #     if(self.is_loaded_signal):
-    #         self.viewer_main_signal_sampling_rate = self.calcualte_loaded_signal_sample_rate()
-    
-    ##############################################
-    # OLD FUNCTION BEFORE USING THE MAX FREQ WAY #
-    ##############################################   
-    #     main_viewer_signal_fft = np.fft.rfft(self.viewer_main_signal)
-    #     main_viewer_signal_fft_positive_magnitudes = np.abs(main_viewer_signal_fft)
-    #     # main_viewer_signal_frequencies = np.fft.rfftfreq(len(self.viewer_main_signal), self.viewer_main_signal_sampling_rate)
-    #     # Replace up by down
-    #     main_viewer_signal_frequencies = np.fft.rfftfreq(self.viewer_main_signal_time_points_length, 1/50)
-    #     main_viewer_signal_max_frequency_index = np.argmax(main_viewer_signal_fft_positive_magnitudes)
-    #     main_viewer_signal_max_frequency_value = main_viewer_signal_frequencies[main_viewer_signal_max_frequency_index]
-    #     return main_viewer_signal_max_frequency_value
     
     def calculate_viewer_main_signal_max_frequency(self):
         if(self.is_loaded_signal):
@@ -407,34 +360,3 @@ class signalReconstructor():
         csv_signal_delta_t = time_diffs_between_two_samples.mean()
         csv_signal_sample_rate = 1 / csv_signal_delta_t
         return csv_signal_sample_rate
-
-########################################################################################################        
-# def generate_continuous_signal(freq, duration, sampling_rate):
-#         t = np.linspace(0, duration, int(sampling_rate * duration) , endpoint= False)
-#         signal = np.sin(2 * np.pi * freq * t)
-#         return signal ,t
-# signal , t = generate_continuous_signal(freq= 4, duration=4 , sampling_rate=1000)
-
-# def synthetic_mixed_signal():
-#     component1 = SignalComponent(2.0 , 1.0 , 0.0 , 1)
-#     component2 = SignalComponent(2.0 , 2.0 , 0.0 , 2)
-#     component3 = SignalComponent(2.0 , 10.0 , 0.0 , 3)
-#     component4 = SignalComponent(10.0 , 24.0 , 0.0 , 4)
-#     component5 = SignalComponent(4.0 , 6.0 , 0.0 , 5)
-#     components = {
-#         'component1': component1,
-#         'component2': component2,
-#         'component3': component3,
-#         'component4': component4,
-#         'component5': component5
-#     }
-#     mixer = Mixer()
-#     signal = mixer.mix_signal(components)
-#     print(signal)
-#     return signal.signal , signal.signal_components , signal.max_frequency
-
-# t , signal , max_freq = synthetic_mixed_signal()
-# plt.plot(t , signal)
-# reconstruction = signalReconstructor(selected_reconstruction_method="Whittaker-Shannon" , viewer_main_signal=signal , viewer_main_signal_max_frequency= max_freq, viewer_main_signal_time_points_array= t)
-# reconstruction.reconstruct_main_viewer_signal()
-# reconstruction.calculate_reconstruction_error()
