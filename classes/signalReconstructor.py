@@ -14,7 +14,7 @@ class signalReconstructor():
         self._viewer_main_signal = viewer_main_signal
         self._signal_reconstruction_sampling_frequency = 0
         self._signal_reconstruction_nyquist_rate = 0
-        self._selected_reconstruction_method = "Hamming"
+        self._selected_reconstruction_method = "sinc_kaiser"
         self.viewer_main_sampled_signal = []
         self._reconstructed_signal = []
         self._signal_reconstruction_error = [],
@@ -146,6 +146,12 @@ class signalReconstructor():
             self.reconstructed_signal = self.reconstruct_using_lanczos(
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
+        
+        elif (self.selected_reconstruction_method == "sinc_kaiser"):
+            self.reconstructed_signal = self.reconstruct_using_lanczos(
+                self.viewer_main_signal_time_points_array, sampled_signal_values
+            )
+        
         
         elif(self.selected_reconstruction_method == ""):
             pass
@@ -288,6 +294,29 @@ class signalReconstructor():
         
         return reconstructed_signal
 
+
+    def reconstruct_using_sinc_kaiser(self, reconstruction_time, sampled_signal_values, beta=8.6):
+        # Initialize the reconstructed signal
+        reconstructed_signal = np.zeros_like(reconstruction_time)
+        
+        # Sampling period
+        sampling_period = 1 / self.signal_reconstruction_sampling_frequency if self.signal_reconstruction_sampling_frequency > 0 else 1.0
+        N = len(sampled_signal_values)
+        
+        # Generate Kaiser window based on the length of sampled_signal_values and given beta
+        kaiser_window = np.kaiser(N, beta)
+        
+        for n, x_n in enumerate(sampled_signal_values):
+            # Calculate the time difference between each reconstruction point and the nth sample
+            time_diff = reconstruction_time - n * sampling_period
+            
+            # Calculate sinc function modified with sampling period, and apply Kaiser window at each sample index
+            sinc_kaiser = np.sinc(time_diff / sampling_period) * kaiser_window[n]
+            
+            # Accumulate contributions from each sample, weighted by sinc-Kaiser kernel
+            reconstructed_signal += x_n * sinc_kaiser
+        
+        return reconstructed_signal
 
         
     def reconstruct_using_lanczos(self,reconstuction_time_interval, sampled_signal_values):
