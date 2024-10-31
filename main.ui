@@ -844,11 +844,6 @@ QComboBox QAbstractItemView {
            </item>
            <item>
             <property name="text">
-             <string>Kaiser</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
              <string>Deponacchi</string>
             </property>
            </item>

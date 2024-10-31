@@ -52,7 +52,7 @@ class PlotController():
     
     def frequency_domain(self):
         self.frequency_viewer.clear()
-        main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes = self.reconstructed_signal_obj.apply_fourier_transform_viewer_main_signal()
+        main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes = self.reconstructed_signal_obj.apply_fourier_transform_viewer_reconstructed_signal()
         self.frequency_viewer.plot(main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(0,255,0)))
         self.frequency_viewer.plot(-main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(0,255,0)))
         self.frequency_viewer.plot(-main_viewer_signal_frequencies + 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))

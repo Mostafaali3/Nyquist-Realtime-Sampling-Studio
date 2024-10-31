@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         
         self.sampling_frequency_slider = self.findChild(QSlider , "samplingFrequencySlider")
         self.sampling_frequency_slider.setMinimum(0)
-        self.sampling_frequency_slider.setMaximum(2)
+        self.sampling_frequency_slider.setMaximum(1)
         self.sampling_frequency_slider.setPageStep(1)
         self.sampling_frequency_slider.valueChanged.connect(self.sampling_frequency_slider_change_effect)
         
@@ -408,29 +408,6 @@ class MainWindow(QMainWindow):
         if nonzero_indices.size > 0:
             main_viewer_signal_max_frequency_value = freqs[nonzero_indices[-1]]
             return int(math.ceil(main_viewer_signal_max_frequency_value))
-        
-        # return max_frequency
-    
-    # def calculate_max_frequency(self, signal: Channel):
-    #     time = np.array(signal.signal[0])
-    #     readings = np.array(signal.signal[1])
-    #     sampling_rate = 1 / (time[1] - time[0])
-
-    #     # Perform FFT
-    #     Y = np.fft.fft(readings)
-    #     freqs = np.fft.fftfreq(len(readings), d=(time[1] - time[0]))
-
-    #     # Calculate the magnitude spectrum
-    #     magnitude = np.abs(Y)
-
-    #     # Find the index of the maximum magnitude
-    #     max_index = np.argmax(magnitude)
-        
-    #     # Corresponding frequency with the highest magnitude
-    #     max_frequency = abs(freqs[max_index])
-    #     print(max_frequency)
-        
-    #     return max_frequency
 
     
 if __name__ == '__main__':
