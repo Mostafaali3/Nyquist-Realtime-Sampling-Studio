@@ -238,28 +238,60 @@ class signalReconstructor():
         return reconstructed_signal
     
     def reconstruct_using_hamming(self, reconstruction_time, sampled_signal_values):
-        N = len(self.sampled_signal)
-        hamming_window = np.hamming(N)
-        sampled_signal_windowed = hamming_window * self.sampled_signal
-        if self.signal_reconstruction_sampling_frequency == 0:
-            sampled_time = np.arange(0, N / (self.signal_reconstruction_sampling_frequency+1), 1 / (self.signal_reconstruction_sampling_frequency+1))
-        else:
-            sampled_time = np.arange(0, N / self.signal_reconstruction_sampling_frequency, 1 / self.signal_reconstruction_sampling_frequency) 
-        return np.interp(reconstruction_time, sampled_time, sampled_signal_windowed)
-
-    
-    def reconstruct_using_kaiser(self, reconstuction_time_interval, sampled_signal_values, beta=8.6):
-        # Reconstruction using Kaiser window with default beta=8.6
-        reconstructed_signal = np.zeros_like(reconstuction_time_interval)
+        reconstructed_signal = np.zeros_like(reconstruction_time)
+        sampling_period = 1 / self.signal_reconstruction_sampling_frequency if self.signal_reconstruction_sampling_frequency > 0 else 1.0
         N = len(sampled_signal_values)
-        kaiser_window = np.kaiser(N, beta)
         
         for n, x_n in enumerate(sampled_signal_values):
-            sinc_arg = (reconstuction_time_interval - n / self._signal_reconstruction_sampling_frequency) * self._signal_reconstruction_sampling_frequency
-            reconstructed_signal += x_n * np.sinc(sinc_arg) * kaiser_window[n]
+            window_size = max(3, N - abs(n - (N // 2)))
+            hamming_window = np.hamming(window_size)
+            center_time = n * sampling_period
+            window_times = np.linspace(-0.5, 0.5, window_size) * window_size / self.signal_reconstruction_sampling_frequency
+            
+            # Convolve the sample with the Hamming window over valid intervals
+            convolution = x_n * hamming_window
+            for i, t_shift in enumerate(window_times):
+                interval_indices = np.where(
+                    (reconstruction_time >= center_time + t_shift - sampling_period / 2) &
+                    (reconstruction_time < center_time + t_shift + sampling_period / 2)
+                )[0]
+                
+                if interval_indices.size > 0:
+                    reconstructed_signal[interval_indices] += convolution[i]
         
         return reconstructed_signal
-    
+        
+    def reconstruct_using_kaiser(self, reconstruction_time, sampled_signal_values, beta=8.6):
+        # Initialize the reconstructed signal
+        reconstructed_signal = np.zeros_like(reconstruction_time)
+        
+        # Sampling period
+        sampling_period = 1 / self.signal_reconstruction_sampling_frequency if self.signal_reconstruction_sampling_frequency > 0 else 1.0
+        N = len(sampled_signal_values)
+        
+        for n, x_n in enumerate(sampled_signal_values):
+            # Define a Hamming window with decreasing size near boundaries
+            window_size = max(3, N - abs(n - (N // 2)))
+            kaiser_window = np.kaiser(window_size,8.6)
+            
+            # Adjust windowed time shifts based on the sample index
+            center_time = n * sampling_period
+            window_times = np.linspace(-0.5, 0.5, window_size) * window_size / self.signal_reconstruction_sampling_frequency
+            
+            # Convolve the sample with the Hamming window over valid intervals
+            convolution = x_n * kaiser_window
+            for i, t_shift in enumerate(window_times):
+                interval_indices = np.where(
+                    (reconstruction_time >= center_time + t_shift - sampling_period / 2) &
+                    (reconstruction_time < center_time + t_shift + sampling_period / 2)
+                )[0]
+                
+                if interval_indices.size > 0:
+                    reconstructed_signal[interval_indices] += convolution[i]
+        
+        return reconstructed_signal
+
+
         
     def reconstruct_using_lanczos(self,reconstuction_time_interval, sampled_signal_values):
         reconstructed_signal = np.zeros_like(reconstuction_time_interval)
