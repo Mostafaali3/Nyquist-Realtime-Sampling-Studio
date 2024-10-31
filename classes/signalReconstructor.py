@@ -14,7 +14,7 @@ class signalReconstructor():
         self._viewer_main_signal = viewer_main_signal
         self._signal_reconstruction_sampling_frequency = 0
         self._signal_reconstruction_nyquist_rate = 0
-        self._selected_reconstruction_method = selected_reconstruction_method
+        self._selected_reconstruction_method = "Hamming"
         self.viewer_main_sampled_signal = []
         self._reconstructed_signal = []
         self._signal_reconstruction_error = [],
@@ -168,52 +168,47 @@ class signalReconstructor():
         else:
             sampling_period = 1 / self.signal_reconstruction_sampling_frequency
             
-        # Perform zero-hold reconstruction by holding each sample value constant over the sampling period
         for n, x_n in enumerate(sampled_signal_values):
-            # Determine the time range over which the current sample x_n should be held
             start_time = n * sampling_period
             end_time = (n + 1) * sampling_period
-            
-            # Find the indices within the reconstruction time interval that fall within this period
             hold_indices = np.where((reconstruction_time_interval >= start_time) & 
                                     (reconstruction_time_interval < end_time))
             
-            # Set these indices to the value of the current sample
             reconstructed_signal[hold_indices] = x_n
         
         return reconstructed_signal
 
     def reconstruct_using_first_order_hold(self, reconstruction_time_interval, sampled_signal_values):
         """
-        First-order hold (linear interpolation) reconstruction method.
+        First-order hold (linear interpolation) reconstruction method with edge case handling.
         """
-        reconstructed_signal = np.zeros_like(reconstruction_time_interval)
-        if self.signal_reconstruction_sampling_frequency == 0:
-            sampling_period = 1 / (self.signal_reconstruction_sampling_frequency+1)
-        else:
-            sampling_period = 1 / self.signal_reconstruction_sampling_frequency
+        if len(sampled_signal_values) == 0:
+            return np.zeros_like(reconstruction_time_interval)
         
-        # Iterate over each sample, except the last one
+        reconstructed_signal = np.zeros_like(reconstruction_time_interval)
+        
+        sampling_period = 1 / self.signal_reconstruction_sampling_frequency if self.signal_reconstruction_sampling_frequency > 0 else 1.0
+        
         for n in range(len(sampled_signal_values) - 1):
             x_n = sampled_signal_values[n]
             x_next = sampled_signal_values[n + 1]
             
-            # Define start and end times for the current interval
             start_time = n * sampling_period
             end_time = (n + 1) * sampling_period
             
-            # Find indices in reconstruction time interval that fall within the current interval
-            interval_indices = np.where((reconstruction_time_interval >= start_time) & 
+            interval_indices = np.where((reconstruction_time_interval >= start_time) &
                                         (reconstruction_time_interval < end_time))
             
-            # Linearly interpolate between x_n and x_next over this interval
             t = (reconstruction_time_interval[interval_indices] - start_time) / (end_time - start_time)
             reconstructed_signal[interval_indices] = x_n * (1 - t) + x_next * t
         
-        # Set the last segment to the last sample value
-        reconstructed_signal[reconstruction_time_interval >= (len(sampled_signal_values) - 1) * sampling_period] = sampled_signal_values[-1]
+        if len(sampled_signal_values) > 1:
+            reconstructed_signal[reconstruction_time_interval >= (len(sampled_signal_values) - 1) * sampling_period] = sampled_signal_values[-1]
+        else:
+            reconstructed_signal[:] = sampled_signal_values[0]
         
         return reconstructed_signal
+
 
     def reconstruct_using_hann(self, reconstuction_time_interval, sampled_signal_values):
         # Reconstruction using Hann window
