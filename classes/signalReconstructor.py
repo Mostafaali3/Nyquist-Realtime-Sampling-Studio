@@ -292,7 +292,7 @@ class signalReconstructor():
     def reconstruct_using_lanczos(self,reconstuction_time_interval, sampled_signal_values):
         reconstructed_signal = np.zeros_like(reconstuction_time_interval)
         for n, x_n in enumerate(sampled_signal_values):
-            time_diff = (reconstuction_time_interval - n / self.signal_reconstruction_sampling_frequency) if self.signal_reconstruction_sampling_frequency > 0 else (reconstruction_time_interval - n)  # Handle division by zero
+            time_diff = (reconstuction_time_interval - n / self.signal_reconstruction_sampling_frequency) if self.signal_reconstruction_sampling_frequency > 0 else (reconstuction_time_interval - n)  # Handle division by zero
             sinc_term = np.sinc(time_diff * self.signal_reconstruction_sampling_frequency)
             lanczos_window = np.sinc(time_diff / 3)
             reconstructed_signal += x_n * sinc_term * lanczos_window
