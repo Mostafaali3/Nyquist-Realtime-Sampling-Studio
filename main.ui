@@ -330,7 +330,7 @@ margin: 0;</string>
 margin: 0;</string>
              </property>
              <property name="text">
-              <string>0</string>
+              <string>1</string>
              </property>
             </widget>
            </item>
@@ -835,6 +835,16 @@ QComboBox QAbstractItemView {
            <item>
             <property name="text">
              <string>Lanczos</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>First Order</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Deponacchi</string>
             </property>
            </item>
           </widget>

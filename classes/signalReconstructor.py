@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from classes.channel import Channel
+import pywt
 class signalReconstructor():
     def __init__(   
                     self , 
@@ -14,7 +15,7 @@ class signalReconstructor():
         self._viewer_main_signal = viewer_main_signal
         self._signal_reconstruction_sampling_frequency = 0
         self._signal_reconstruction_nyquist_rate = 0
-        self._selected_reconstruction_method = "sinc_kaiser"
+        self._selected_reconstruction_method = selected_reconstruction_method
         self.viewer_main_sampled_signal = []
         self._reconstructed_signal = []
         self._signal_reconstruction_error = [],
@@ -132,7 +133,7 @@ class signalReconstructor():
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
         
-        elif self.selected_reconstruction_method == "First_order":
+        elif self.selected_reconstruction_method == "First Order":
             self.reconstructed_signal = self.reconstruct_using_first_order_hold(
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
@@ -153,8 +154,10 @@ class signalReconstructor():
             )
         
         
-        elif(self.selected_reconstruction_method == ""):
-            pass
+        elif(self.selected_reconstruction_method == "Deponacchi"):
+            self.reconstructed_signal = self.reconstruct_using_wavelet(
+                self.viewer_main_signal_time_points_array, sampled_signal_values
+            )
         
         return self.reconstuction_time_interval , self.reconstructed_signal
     
@@ -296,6 +299,20 @@ class signalReconstructor():
         return reconstructed_signal
     
     
+    def reconstruct_using_wavelet(self, reconstuction_time_interval, sampled_signal_values, wavelet='db1'):
+
+        coeffs = pywt.wavedec(sampled_signal_values, wavelet)
+        reconstructed_signal = pywt.waverec(coeffs, wavelet)
+        time_scale_factor = reconstuction_time_interval[-1] / len(reconstructed_signal)
+        reconstructed_signal = np.interp(
+            reconstuction_time_interval,  # target interval (e.g., 0 to 20)
+            np.linspace(0, reconstuction_time_interval[-1], len(reconstructed_signal)),  # reconstructed interval
+            reconstructed_signal
+        )
+        
+        return reconstructed_signal
+    
+    
     def sample_viewer_main_signal(self):
         self.viewer_main_signal_time_points_length = len(self.viewer_main_signal_time_points_array)
         self.signal_reconstruction_max_sampling_frequency = 4 * self.viewer_main_signal_max_frequency
@@ -326,6 +343,13 @@ class signalReconstructor():
     
     def apply_fourier_transform_viewer_main_signal(self):
         main_viewer_signal_fft = np.fft.rfft(self.viewer_main_signal)
+        main_viewer_signal_fft_positive_magnitudes = np.abs(main_viewer_signal_fft)
+        main_viewer_signal_frequencies = np.fft.rfftfreq(self.viewer_main_signal_time_points_length, 1/50)
+        
+        return main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes
+    
+    def apply_fourier_transform_viewer_reconstructed_signal(self):
+        main_viewer_signal_fft = np.fft.rfft(self.reconstructed_signal)
         main_viewer_signal_fft_positive_magnitudes = np.abs(main_viewer_signal_fft)
         main_viewer_signal_frequencies = np.fft.rfftfreq(self.viewer_main_signal_time_points_length, 1/50)
         
