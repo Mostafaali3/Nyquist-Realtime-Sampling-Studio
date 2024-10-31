@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
         
         self.sampling_frequency_slider = self.findChild(QSlider , "samplingFrequencySlider")
         self.sampling_frequency_slider.setMinimum(0)
-        self.sampling_frequency_slider.setMaximum(1)
+        self.sampling_frequency_slider.setMaximum(2)
         self.sampling_frequency_slider.setPageStep(1)
         self.sampling_frequency_slider.valueChanged.connect(self.sampling_frequency_slider_change_effect)
         

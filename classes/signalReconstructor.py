@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from classes.channel import Channel
+import pywt
 class signalReconstructor():
     def __init__(   
                     self , 
@@ -132,7 +133,7 @@ class signalReconstructor():
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
         
-        elif self.selected_reconstruction_method == "First_order":
+        elif self.selected_reconstruction_method == "First Order":
             self.reconstructed_signal = self.reconstruct_using_first_order_hold(
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
@@ -147,8 +148,10 @@ class signalReconstructor():
                 self.viewer_main_signal_time_points_array, sampled_signal_values
             )
         
-        elif(self.selected_reconstruction_method == ""):
-            pass
+        elif(self.selected_reconstruction_method == "Deponacchi"):
+            self.reconstructed_signal = self.reconstruct_using_wavelet(
+                self.viewer_main_signal_time_points_array, sampled_signal_values
+            )
         
         return self.reconstuction_time_interval , self.reconstructed_signal
     
@@ -265,6 +268,26 @@ class signalReconstructor():
             sinc_term = np.sinc(time_diff * self.signal_reconstruction_sampling_frequency)
             lanczos_window = np.sinc(time_diff / 3)
             reconstructed_signal += x_n * sinc_term * lanczos_window
+        return reconstructed_signal
+    
+    
+    def reconstruct_using_wavelet(self, reconstuction_time_interval, sampled_signal_values, wavelet='morl'):
+
+        coeffs = pywt.wavedec(sampled_signal_values, wavelet)
+        
+        # Reconstruct the signal from wavelet coefficients
+        reconstructed_signal = pywt.waverec(coeffs, wavelet)
+        
+        # Define the scaling factor based on the input time range
+        time_scale_factor = reconstuction_time_interval[-1] / len(reconstructed_signal)
+
+        # Interpolate to fit the original time interval (0 to 20, with 1000 points)
+        reconstructed_signal = np.interp(
+            reconstuction_time_interval,  # target interval (e.g., 0 to 20)
+            np.linspace(0, reconstuction_time_interval[-1], len(reconstructed_signal)),  # reconstructed interval
+            reconstructed_signal
+        )
+        
         return reconstructed_signal
     
     
