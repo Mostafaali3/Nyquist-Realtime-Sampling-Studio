@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt
 
 components_map = {}
 
@@ -63,6 +64,9 @@ def add_component(grid_layout, number):
     row_position = grid_layout.rowCount()  # Place new component in the next row
     grid_layout.addLayout(component_layout, row_position, 0)
     components_map[number] = component_layout
+
+    component_layout.setAlignment(Qt.AlignTop)
+
 
 def clear_layout(layout):
     if layout is not None:
