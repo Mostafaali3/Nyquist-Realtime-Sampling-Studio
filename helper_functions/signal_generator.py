@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QPushButton, QSpacerItem, QSizePolicy
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import Qt
 
 signals_map = {}
 is_signal_shown = {}
@@ -67,6 +68,8 @@ def add_signal(grid_layout, number):
     grid_layout.addLayout(signals_layout, row_position, 0)
     signals_map[number] = signals_layout
     is_signal_shown[number] = True  # Initialize the visibility state
+    grid_layout.setAlignment(Qt.AlignTop)
+
 
 
 def clear_layout(layout):
