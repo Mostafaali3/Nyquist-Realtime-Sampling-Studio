@@ -35,18 +35,19 @@ class PlotController():
             self.reconstructed_signal_obj.viewer_main_signal = viewer_main_signal_y_values + self.current_channel.noise
         else:
             self.reconstructed_signal_obj.viewer_main_signal = viewer_main_signal_y_values
-        reconstructed_signal_x_values , reconstructed_signal_y_values = self.reconstructed_signal_obj.reconstruct_main_viewer_signal()
-        self.reconstruction_viewer.plot(reconstructed_signal_x_values , reconstructed_signal_y_values, pen=pg.mkPen(color = 'b' , width=3))
-        self.reconstruction_viewer.setLimits(xMin = 0,xMax =reconstructed_signal_x_values[-1])
-        self.reconstruction_viewer.setXRange(0,(reconstructed_signal_x_values[-1]/5))
+        self.reconstructed_signal_x_values , reconstructed_signal_y_values = self.reconstructed_signal_obj.reconstruct_main_viewer_signal()
+        self.reconstruction_viewer.plot(self.reconstructed_signal_x_values , reconstructed_signal_y_values, pen=pg.mkPen(color = 'b' , width=3))
+        self.reconstruction_viewer.setLimits(xMin = 0,xMax =20)
+        self.reconstruction_viewer.setXRange(0,(self.reconstructed_signal_x_values[-1]/5))
         self.reconstruction_viewer.setYRange(min(reconstructed_signal_y_values),max(reconstructed_signal_y_values))
         
     
     def reconstruction_error(self):
         self.error_viewer.clear()
         viewer_main_signal_reconstruction_error = self.reconstructed_signal_obj.calculate_reconstruction_error()
-        self.error_viewer.plot(self.viewer_main_signal_x_values , viewer_main_signal_reconstruction_error , pen=pg.mkPen(color = 'r' , width=3))
-        self.error_viewer.setLimits(xMin = 0,xMax =self.viewer_main_signal_x_values[-1])
+        self.error_viewer.plot(self.reconstructed_signal_x_values , viewer_main_signal_reconstruction_error , pen=pg.mkPen(color = 'r' , width=3))
+        self.error_viewer.setLimits(xMin = 0,xMax =20)
+        # self.error_viewer.setLimits(xMin = 0,xMax =self.viewer_main_signal_x_values[-1])
         self.error_viewer.setXRange(0,self.viewer_main_signal_x_values[-1]/5)
         self.error_viewer.setYRange(min(viewer_main_signal_reconstruction_error),max(viewer_main_signal_reconstruction_error))
     

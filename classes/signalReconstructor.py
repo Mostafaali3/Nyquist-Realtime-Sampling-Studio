@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from classes.channel import Channel
 import pywt
+from scipy.interpolate import interp1d
+
+
 class signalReconstructor():
     def __init__(   
                     self , 
@@ -292,7 +295,7 @@ class signalReconstructor():
     def reconstruct_using_lanczos(self,reconstuction_time_interval, sampled_signal_values):
         reconstructed_signal = np.zeros_like(reconstuction_time_interval)
         for n, x_n in enumerate(sampled_signal_values):
-            time_diff = (reconstuction_time_interval - n / self.signal_reconstruction_sampling_frequency) if self.signal_reconstruction_sampling_frequency > 0 else (reconstruction_time_interval - n)  # Handle division by zero
+            time_diff = (reconstuction_time_interval - n / self.signal_reconstruction_sampling_frequency) if self.signal_reconstruction_sampling_frequency > 0 else (reconstuction_time_interval - n)  # Handle division by zero
             sinc_term = np.sinc(time_diff * self.signal_reconstruction_sampling_frequency)
             lanczos_window = np.sinc(time_diff / 3)
             reconstructed_signal += x_n * sinc_term * lanczos_window
@@ -318,12 +321,27 @@ class signalReconstructor():
         self.signal_reconstruction_max_sampling_frequency = 4 * self.viewer_main_signal_max_frequency
         self.reconstuction_time_interval = self.viewer_main_signal_time_points_array
         sampled_time_values = np.linspace(0 , int(round(self.viewer_main_signal_time_points_array[-1])) , (int(round(self.viewer_main_signal_time_points_array[-1]) * self.signal_reconstruction_sampling_frequency)) , endpoint= False )
-        sampled_signal_values = np.interp(sampled_time_values, self.viewer_main_signal_time_points_array,  self.viewer_main_signal )
+        # sampled_signal_values = np.interp(sampled_time_values, self.viewer_main_signal_time_points_array,  self.viewer_main_signal )
+        interpolator = interp1d(self.viewer_main_signal_time_points_array, self.viewer_main_signal, kind='cubic')
+        sampled_signal_values = interpolator(sampled_time_values)
+        self.reconstuction_time_interval = list(self.reconstuction_time_interval)
+        self.viewer_main_signal = list(self.viewer_main_signal)
+        if (len(sampled_signal_values) != 0 and len(sampled_signal_values) < 1000):
+            temp_viewer_main_signal = self.viewer_main_signal[1:]
+            self.viewer_main_signal.extend(temp_viewer_main_signal)
+            self.viewer_main_signal_time_points_array = np.linspace(0 , (self.viewer_main_signal_time_points_array[-1] * 2)  , self.viewer_main_signal_time_points_length * 2)
+            self.reconstuction_time_interval = np.linspace(0 , self.reconstuction_time_interval[-1] * 2  , self.viewer_main_signal_time_points_length * 2)
+            # self.viewer_main_signal_time_points_array = np.arange(0 , (self.viewer_main_signal_time_points_array[-1] * 2)  , (self.viewer_main_signal_time_points_array[1] - self.viewer_main_signal_time_points_array[0]))
+            # self.reconstuction_time_interval = np.arange(0 , self.reconstuction_time_interval[-1] * 2  , (self.reconstuction_time_interval[1] - self.reconstuction_time_interval[0]))
+            self.sample_viewer_main_signal()
+        self.viewer_main_signal = np.array(self.viewer_main_signal)
+        return sampled_time_values , sampled_signal_values
         # for single_signal_component in self.viewer_main_signal_components:
         #     sampled_signal_values += single_signal_component.amplitude * np.sin(2 * np.pi * sampled_time_values * single_signal_component.frequency)
-        return sampled_time_values , sampled_signal_values
             
     def calculate_reconstruction_error(self):
+        print(self.viewer_main_signal.shape)
+        print(self.reconstructed_signal.shape)
         self.viewer_main_signal_reconstruction_error = self.viewer_main_signal - self.reconstructed_signal
         return self.viewer_main_signal_reconstruction_error
     

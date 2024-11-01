@@ -153,7 +153,7 @@ class MainWindow(QMainWindow):
         #ComboBox Initialization
         self.reconstruction_methods_combobox = self.findChild(QComboBox , "reconstructionMehodsComboBox")
         self.reconstruction_methods_combobox.currentTextChanged.connect(self.reconstruction_method_combobox_change_effect)
-        
+        # self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = 1
     def get_components_text(self):
         '''
         this function returns three floats that are written in the text lables 
@@ -413,8 +413,8 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.make_synthetic_signals_whittaker()
+    # window.make_synthetic_signals_whittaker()
     # window.make_synthetic_signals_zero_hold()
-    window.make_synthetic_signals_lanczos()
+    # window.make_synthetic_signals_lanczos()
     window.show()
     sys.exit(app.exec_())
