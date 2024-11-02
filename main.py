@@ -37,29 +37,8 @@ class MainWindow(QMainWindow):
         self.current_components= {}
         self.current_channles={}
         self.current_shown_channel = None
-
-        # self.components_layout = self.componentsContainerWidget.layout()
-
-        # add_component(self.components_grid_layout, 1)
-        # add_component( self.components_grid_layout, 2)
-        # add_component(self.components_grid_layout, 3)
-        # add_component(self.components_grid_layout, 4)
-        # add_component(self.components_grid_layout, 5)
-        # add_component(self.components_grid_layout, 6)
-        # add_component(self.components_grid_layout, 7)
-        # add_component(self.components_grid_layout, 8)
-        # add_component(self.components_grid_layout, 9)
-        # add_component(self.components_grid_layout, 10)
-
         self.signals_layout = self.signalsContainerWidget.layout()
 
-        # add_signal(self.signals_layout, 1)
-        # add_signal(self.signals_layout, 2)
-        # add_signal(self.signals_layout, 3)
-        # add_signal(self.signals_layout, 4)
-        # add_signal(self.signals_layout, 5)
-        # add_signal(self.signals_layout, 6)
-        # add_signal(self.signals_layout, 7)
 
 
         #######
@@ -176,6 +155,13 @@ class MainWindow(QMainWindow):
             component_delete_button.clicked.connect(lambda:self.delete_component(current_component_index))
             component_edit_button = self.findChild(QPushButton, f"componentEditButton{current_component_index}")
             component_edit_button.clicked.connect(lambda : self.edit_component_pressed(current_component_index))
+            
+            ### code for dynamic viewing of components
+            if self.controller.current_channel:
+                self.controller.clear_all_viewers()
+            mixer = Mixer()
+            mixed_components = mixer.mix_signal(self.current_components)
+            self.controller.set_current_channel(mixed_components)
             self.components_counter+=1
             self.clear_textboxes()
             
@@ -203,6 +189,14 @@ class MainWindow(QMainWindow):
             self.add_component_button.clicked.disconnect()
             self.add_component_button.setText("Add Component")
             self.add_component_button.clicked.connect(self.add_component)
+            
+            ### code for dynamic viewing of components
+            if self.controller.current_channel:
+                self.controller.clear_all_viewers()
+            mixer = Mixer()
+            if len(self.current_components):    
+                mixed_components = mixer.mix_signal(self.current_components)
+                self.controller.set_current_channel(mixed_components)
             self.clear_textboxes()
         
         
@@ -216,6 +210,13 @@ class MainWindow(QMainWindow):
     
     def delete_component(self, component_index): #loop on the signals and the elements and rearrange the indexing 
         self.current_components.pop(component_index)
+        ### code for dynamic viewing of components
+        if self.controller.current_channel:
+            self.controller.clear_all_viewers()
+        mixer = Mixer()
+        if len(self.current_components):    
+            mixed_components = mixer.mix_signal(self.current_components)
+            self.controller.set_current_channel(mixed_components)
         delete_component(self.components_grid_layout, component_index)
             
         

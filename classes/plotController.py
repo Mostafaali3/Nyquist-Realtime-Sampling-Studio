@@ -87,4 +87,5 @@ class PlotController():
         self.reconstruction_viewer.clear()
         self.error_viewer.clear()
         self.frequency_viewer.clear()
-        self.set_current_channel(None)
+        # self.set_current_channel(None)
+        self.__current_channel = None
