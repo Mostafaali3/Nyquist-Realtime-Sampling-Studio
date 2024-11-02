@@ -99,12 +99,13 @@ class MainWindow(QMainWindow):
         self.nyquist_rate_slider.setMinimum(0)
         self.nyquist_rate_slider.setMaximum(4)
         self.nyquist_rate_slider.setPageStep(1)
+        self.nyquist_rate_values = []
         self.nyquist_slider_current_value_label = self.findChild(QLabel , "nequestRateValueLabel")
         self.nyquist_rate_slider.valueChanged.connect(self.nyquist_rate_slider_change_effect)
         
         self.sampling_frequency_slider = self.findChild(QSlider , "samplingFrequencySlider")
         self.sampling_frequency_slider.setMinimum(0)
-        self.sampling_frequency_slider.setMaximum(1)
+        self.sampling_frequency_slider.setMaximum(4)
         self.sampling_frequency_slider.setPageStep(1)
         self.sampling_frequency_slider.valueChanged.connect(self.sampling_frequency_slider_change_effect)
         
@@ -244,6 +245,7 @@ class MainWindow(QMainWindow):
             
             # self.controller.set_current_channel(self.current_shown_channel)
             self.set_sampling_frequency_slider_ranges()
+            self.set_nyquist_rate_slider_ranges()
             self.current_components.clear()
             clear_layout(self.components_grid_layout)
             self.components_counter = 1
@@ -281,6 +283,7 @@ class MainWindow(QMainWindow):
         if self.current_channles[current_index] == self.controller.current_channel:
             self.current_channles.pop(current_index)#remove the signal from the dict 
             delete_signal(self.signals_layout, current_index)# remove the wodget of the signal
+            self.is_noise_added.setChecked(False)
             if len(self.current_channles):
                 for key, signal in self.current_channles.items():
                     self.current_shown_channel = signal
@@ -288,6 +291,7 @@ class MainWindow(QMainWindow):
                     show_hide_button = self.findChild(QPushButton, f"signalShowButton{key}")
                     self.show_signal(show_hide_button, key)
                     self.set_sampling_frequency_slider_ranges()
+                    self.set_nyquist_rate_slider_ranges()
                     break
             else:
                 self.controller.clear_all_viewers()
@@ -318,6 +322,7 @@ class MainWindow(QMainWindow):
             self.current_shown_channel = channel
             self.controller.set_current_channel(self.current_shown_channel)
             self.set_sampling_frequency_slider_ranges()
+            self.set_nyquist_rate_slider_ranges()
             
             #activate the delete button
             signal_delete_button = self.findChild(QPushButton, f"signalDeleteButton{current_channel_index}")
@@ -346,8 +351,13 @@ class MainWindow(QMainWindow):
                     button = self.findChild(QPushButton, f"signalShowButton{key}")
                     hide_signal(button, key)
             self.controller.set_current_channel(self.current_shown_channel)
+            if(len(self.current_shown_channel.noise) == 0):
+                self.is_noise_added.setChecked(False)
+            else:
+                self.is_noise_added.setChecked(True)
             show_signal(current_button, current_index)
             self.set_sampling_frequency_slider_ranges()
+            self.set_nyquist_rate_slider_ranges()
         else:
             self.current_shown_channel.is_hidden = True
             self.current_shown_channel = None
@@ -359,22 +369,26 @@ class MainWindow(QMainWindow):
     def set_sampling_frequency_slider_ranges(self):
         self.sampling_frequency_slider.setMaximum(int(self.controller.current_channel.max_frequency) * 4)
         self.sampling_frequency_max_value_label.setText(str(int(self.controller.current_channel.max_frequency) * 4))
+    
+    def set_nyquist_rate_slider_ranges(self):
+        self.nyquist_rate_slider.setMaximum(int(self.controller.current_channel.max_frequency) * 4)
 
     def sampling_frequency_slider_change_effect(self , new_sampling_frequency):
         self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = new_sampling_frequency
         self.sampling_frequency_slider_current_value_label.setText(str(new_sampling_frequency))
         self.controller.set_current_channel(self.current_shown_channel)
-        self.nyquist_slider_current_value_label.setText(str(math.ceil(new_sampling_frequency * (1 / self.current_shown_channel.max_frequency))))
+        # self.nyquist_slider_current_value_label.setText(str(math.ceil(new_sampling_frequency * (1 / self.current_shown_channel.max_frequency))))
         self.nyquist_rate_slider.blockSignals(True)
-        self.nyquist_rate_slider.setValue(math.ceil(new_sampling_frequency * (1/ self.current_shown_channel.max_frequency)))
+        self.nyquist_rate_slider.setValue(new_sampling_frequency)
+        self.nyquist_slider_current_value_label.setText("{:.1f}".format(new_sampling_frequency / self.current_shown_channel.max_frequency))
         self.nyquist_rate_slider.blockSignals(False)
         
     def nyquist_rate_slider_change_effect(self , new_nyquist_rate):
-        self.nyquist_slider_current_value_label.setText(str(new_nyquist_rate)) 
-        self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = int(new_nyquist_rate * self.current_shown_channel.max_frequency)
-        self.sampling_frequency_slider_current_value_label.setText(str(int(new_nyquist_rate * self.current_shown_channel.max_frequency)))
+        self.nyquist_slider_current_value_label.setText("{:.1f}".format(new_nyquist_rate / self.current_shown_channel.max_frequency)) 
+        self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = new_nyquist_rate
+        self.sampling_frequency_slider_current_value_label.setText(str((new_nyquist_rate)))
         self.sampling_frequency_slider.blockSignals(True)
-        self.sampling_frequency_slider.setValue(int(new_nyquist_rate * self.current_shown_channel.max_frequency))
+        self.sampling_frequency_slider.setValue(int((new_nyquist_rate)))
         self.controller.set_current_channel(self.current_shown_channel)
         self.sampling_frequency_slider.blockSignals(False)
 
