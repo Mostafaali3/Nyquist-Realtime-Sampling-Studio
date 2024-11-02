@@ -56,12 +56,12 @@ class PlotController():
         main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes = self.reconstructed_signal_obj.apply_fourier_transform_viewer_reconstructed_signal()
         self.frequency_viewer.plot(main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(0,255,0)))
         self.frequency_viewer.plot(-main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(0,255,0)))
-        self.frequency_viewer.plot(-main_viewer_signal_frequencies + 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
-        self.frequency_viewer.plot(main_viewer_signal_frequencies + 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
-        self.frequency_viewer.plot(-main_viewer_signal_frequencies - 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
-        self.frequency_viewer.plot(main_viewer_signal_frequencies - 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
-        self.frequency_viewer.setLimits(xMin = -main_viewer_signal_frequencies[-1]- 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency,xMax =3000)
-        self.frequency_viewer.setXRange(-main_viewer_signal_frequencies[-1] - 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency, -(-main_viewer_signal_frequencies[-1] - 2*self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency))
+        self.frequency_viewer.plot(-main_viewer_signal_frequencies + self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
+        self.frequency_viewer.plot(main_viewer_signal_frequencies + self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
+        self.frequency_viewer.plot(-main_viewer_signal_frequencies - self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
+        self.frequency_viewer.plot(main_viewer_signal_frequencies - self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency , main_viewer_signal_fft_positive_magnitudes, pen=pg.mkPen(color=(255,0,0)))
+        self.frequency_viewer.setLimits(xMin = -main_viewer_signal_frequencies[-1]- self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency,xMax =3000)
+        self.frequency_viewer.setXRange(-main_viewer_signal_frequencies[-1] - self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency, -(-main_viewer_signal_frequencies[-1] - self.reconstructed_signal_obj.signal_reconstruction_sampling_frequency))
         self.frequency_viewer.setYRange(min(main_viewer_signal_fft_positive_magnitudes),max(main_viewer_signal_fft_positive_magnitudes))
     
     def add_sample_points_on_viewer(self):
