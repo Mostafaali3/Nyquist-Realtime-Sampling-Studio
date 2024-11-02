@@ -367,7 +367,7 @@ class signalReconstructor():
     def apply_fourier_transform_viewer_reconstructed_signal(self):
         main_viewer_signal_fft = np.fft.rfft(self.reconstructed_signal)
         main_viewer_signal_fft_positive_magnitudes = np.abs(main_viewer_signal_fft)
-        main_viewer_signal_frequencies = np.fft.rfftfreq(self.viewer_main_signal_time_points_length, 1/50)
+        main_viewer_signal_frequencies = np.fft.rfftfreq(self.viewer_main_signal_time_points_length, self.viewer_main_signal_time_points_array[1] - self.viewer_main_signal_time_points_array[0])
         
         return main_viewer_signal_frequencies , main_viewer_signal_fft_positive_magnitudes
         

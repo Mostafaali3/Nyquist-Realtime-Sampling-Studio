@@ -309,10 +309,11 @@ class MainWindow(QMainWindow):
         file_path, _ = QFileDialog.getOpenFileName(self,'Open CSV File', '', 'CSV Files (*.csv);;All Files (*)' )
         if file_path.endswith('.csv'):
             data = pd.read_csv(file_path)
-            data_x = (data['Time [s]'].iloc[0:1000]).to_numpy()
-            data_y = (data[' II'].iloc[0:1000]).to_numpy()
+            data_x = (data['Time [s]'].iloc[0:8000:4]).to_numpy()
+            data_y = (data[' II'].iloc[0:8000:4]).to_numpy()
             channel = Channel(signal_x=data_x, signal_y=data_y)
             channel.max_frequency = self.calculate_max_frequency(channel)
+            channel.is_hidden = True
             
             current_channel_index = copy(self.channels_counter)
             channel.signal_id = current_channel_index
@@ -320,9 +321,7 @@ class MainWindow(QMainWindow):
 
             add_signal(self.signals_layout, current_channel_index)
             self.current_shown_channel = channel
-            self.controller.set_current_channel(self.current_shown_channel)
-            self.set_sampling_frequency_slider_ranges()
-            self.set_nyquist_rate_slider_ranges()
+            # self.controller.set_current_channel(self.current_shown_channel)
             
             #activate the delete button
             signal_delete_button = self.findChild(QPushButton, f"signalDeleteButton{current_channel_index}")
@@ -335,7 +334,10 @@ class MainWindow(QMainWindow):
             real_signal_label = self.findChild(QLabel, f"signalLabel{current_channel_index}")
             real_signal_label.setText(f"Loaded Signal {current_channel_index}")
             
+            
             self.show_signal(show_hide_button, current_channel_index)
+            self.set_sampling_frequency_slider_ranges()
+            self.set_nyquist_rate_slider_ranges()
             
             self.channels_counter+=1
         else:
