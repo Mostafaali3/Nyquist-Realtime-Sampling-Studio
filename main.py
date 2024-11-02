@@ -133,7 +133,8 @@ class MainWindow(QMainWindow):
         #ComboBox Initialization
         self.reconstruction_methods_combobox = self.findChild(QComboBox , "reconstructionMehodsComboBox")
         self.reconstruction_methods_combobox.currentTextChanged.connect(self.reconstruction_method_combobox_change_effect)
-        # self.controller.reconstructed_signal_obj.signal_reconstruction_sampling_frequency = 1
+
+        self.f_max_value_label = self.findChild(QLabel , "label_25")
     def get_components_text(self):
         '''
         this function returns three floats that are written in the text lables 
@@ -360,6 +361,8 @@ class MainWindow(QMainWindow):
             show_signal(current_button, current_index)
             self.set_sampling_frequency_slider_ranges()
             self.set_nyquist_rate_slider_ranges()
+            self.f_max_value_label.setText(str(self.controller.current_channel.max_frequency))
+
         else:
             self.current_shown_channel.is_hidden = True
             self.current_shown_channel = None
