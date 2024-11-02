@@ -226,15 +226,10 @@ class MainWindow(QMainWindow):
             mixed_channel = mixer.mix_signal(self.current_components)
             current_channel_index = copy(self.channels_counter)
             mixed_channel.signal_id = current_channel_index
+            mixed_channel.is_hidden = True
             self.current_channles[current_channel_index] = mixed_channel
             add_signal(self.signals_layout, current_channel_index)
             self.current_shown_channel = mixed_channel
-            self.controller.set_current_channel(self.current_shown_channel)
-            self.set_sampling_frequency_slider_ranges()
-            self.current_components.clear()
-            clear_layout(self.components_grid_layout)
-            self.components_counter = 1
-            mixed_channel.export_to_csv()
             
             #activate the delete button
             signal_delete_button = self.findChild(QPushButton, f"signalDeleteButton{current_channel_index}")
@@ -243,6 +238,19 @@ class MainWindow(QMainWindow):
             #activate the show hide button 
             show_hide_button = self.findChild(QPushButton, f"signalShowButton{current_channel_index}")
             show_hide_button.clicked.connect(lambda:self.show_signal(show_hide_button, current_channel_index))
+            
+            #set the channel
+            self.show_signal(show_hide_button, current_channel_index)
+            
+            # self.controller.set_current_channel(self.current_shown_channel)
+            self.set_sampling_frequency_slider_ranges()
+            self.current_components.clear()
+            clear_layout(self.components_grid_layout)
+            self.components_counter = 1
+            mixed_channel.export_to_csv()
+            
+            
+            
             self.clear_textboxes()
             self.channels_counter+=1
     
@@ -276,7 +284,9 @@ class MainWindow(QMainWindow):
             if len(self.current_channles):
                 for key, signal in self.current_channles.items():
                     self.current_shown_channel = signal
-                    self.controller.set_current_channel(signal)
+                    # self.controller.set_current_channel(signal)
+                    show_hide_button = self.findChild(QPushButton, f"signalShowButton{key}")
+                    self.show_signal(show_hide_button, key)
                     self.set_sampling_frequency_slider_ranges()
                     break
             else:
@@ -320,6 +330,7 @@ class MainWindow(QMainWindow):
             real_signal_label = self.findChild(QLabel, f"signalLabel{current_channel_index}")
             real_signal_label.setText(f"Loaded Signal {current_channel_index}")
             
+            self.show_signal(show_hide_button, current_channel_index)
             
             self.channels_counter+=1
         else:
@@ -327,13 +338,13 @@ class MainWindow(QMainWindow):
         
     def show_signal(self,current_button, current_index):
         self.current_shown_channel = self.current_channles[current_index]
-        if self.current_shown_channel.is_hidden or None:
+        if self.current_shown_channel.is_hidden:
             self.current_shown_channel.is_hidden = False
             for key, channel in self.current_channles.items():
                 if key !=current_index:
                     channel.is_hidden = True
-                    button = self.findChild(QPushButton, f"signalShowButton{current_index}")
-                    hide_signal(button, current_index)
+                    button = self.findChild(QPushButton, f"signalShowButton{key}")
+                    hide_signal(button, key)
             self.controller.set_current_channel(self.current_shown_channel)
             show_signal(current_button, current_index)
             self.set_sampling_frequency_slider_ranges()
