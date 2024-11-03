@@ -339,8 +339,12 @@ class signalReconstructor():
         # for single_signal_component in self.viewer_main_signal_components:
         #     sampled_signal_values += single_signal_component.amplitude * np.sin(2 * np.pi * sampled_time_values * single_signal_component.frequency)
             
-    def calculate_reconstruction_error(self):
+    def calculate_reconstruction_error_without_noise(self):
         self.viewer_main_signal_reconstruction_error = self.viewer_main_signal - self.reconstructed_signal
+        return self.viewer_main_signal_reconstruction_error
+    
+    def calculate_reconstruction_error_with_noise(self , original_signal):
+        self.viewer_main_signal_reconstruction_error = original_signal - self.reconstructed_signal
         return self.viewer_main_signal_reconstruction_error
     
     def calculate_viewer_main_signal_max_frequency(self):

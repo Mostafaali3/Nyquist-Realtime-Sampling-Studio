@@ -2,6 +2,7 @@ from classes.viewer import Viewer
 from classes.channel import Channel
 from classes.signalReconstructor import signalReconstructor
 import pyqtgraph as pg
+from copy import deepcopy
 class PlotController():
     def __init__(self, sampling_viewer:Viewer, reconstruction_viewer:Viewer, error_viewer:Viewer, frequency_viewer:Viewer,channels_dict:dict, current_channel:Channel = Channel()):
         self.sampling_viewer = sampling_viewer
@@ -44,7 +45,12 @@ class PlotController():
     
     def reconstruction_error(self):
         self.error_viewer.clear()
-        viewer_main_signal_reconstruction_error = self.reconstructed_signal_obj.calculate_reconstruction_error()
+        if(len(self.current_channel.noise) == 0 ):
+            viewer_main_signal_reconstruction_error = self.reconstructed_signal_obj.calculate_reconstruction_error_without_noise()
+        else:
+            original_signal_without_noise = deepcopy(self.current_channel)
+            original_signal_without_noise.noise = []
+            viewer_main_signal_reconstruction_error = self.reconstructed_signal_obj.calculate_reconstruction_error_with_noise(original_signal_without_noise.signal[1])
         self.error_viewer.plot(self.reconstructed_signal_x_values , viewer_main_signal_reconstruction_error , pen=pg.mkPen(color = 'r' , width=3))
         self.error_viewer.setLimits(xMin = 0,xMax =20)
         # self.error_viewer.setLimits(xMin = 0,xMax =self.viewer_main_signal_x_values[-1])

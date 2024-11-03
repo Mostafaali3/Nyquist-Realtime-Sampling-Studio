@@ -444,7 +444,7 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
-    # window.make_synthetic_signals_whittaker()
+    window.make_synthetic_signals_whittaker()
     # window.make_synthetic_signals_zero_hold()
     # window.make_synthetic_signals_lanczos()
     window.show()
