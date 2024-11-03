@@ -9,6 +9,8 @@
     <file>..\icons_setup\icons\delete.png</file>
     <file>..\icons_setup\icons\show.png</file>
     <file>..\icons_setup\icons\hide.png</file>
+    <file>..\icons_setup\icons\logo2.png</file>
+    <file>..\icons_setup\icons\logo3.png</file>
 
   </qresource>
 </RCC>

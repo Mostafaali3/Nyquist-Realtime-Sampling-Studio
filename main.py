@@ -39,8 +39,8 @@ class MainWindow(QMainWindow):
         self.current_shown_channel = None
         self.signals_layout = self.signalsContainerWidget.layout()
 
-
-
+        self.image_label = self.findChild(QLabel, 'imageLabel')
+        self.image_label.setPixmap(QIcon('icons_setup\icons\logo3.png').pixmap(300,300))
         #######
         # initializing the viewers
         self.sampling_viewer = Viewer()
