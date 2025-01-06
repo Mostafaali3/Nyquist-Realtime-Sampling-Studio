@@ -37,6 +37,22 @@ This project is a desktop application developed to demonstrate the principles of
 8. **Testing Scenarios**:
    - Includes test cases demonstrating scenarios like aliasing and signal reconstruction challenges.
 
+
+---
+
+## Dependencies
+
+The Multi-Signal Viewer relies on the following technologies and libraries to deliver its robust functionality:
+
+| **Dependency**       | **Description**                                       |
+|-----------------------|-------------------------------------------------------|
+| Python 3.x           | Core programming language.                            |
+| NumPy                | Numerical computations for signal processing.         |
+| Pandas               | Data manipulation and analysis.                       |
+| SciPy                | Advanced scientific computing and interpolation.      |
+| PyQt5                | GUI framework for building desktop applications.      |
+| PyQtGraph            | Fast plotting and 2D/3D visualization in PyQt.        |
+
 ---
 
 ## Setup Instructions
@@ -58,3 +74,39 @@ pip install -r requirements.txt
 ```bash
 python main.py
 ```
+
+---
+
+## Contributors <a name="Contributors"></a>
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Mostafaali3" target="_blank">
+        <img src="https://github.com/Mostafaali3.png" width="150px;" alt="Mostafa Ali"/>
+        <br />
+        <sub><b>Mostafa Ali</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Youssef-Abo-El-Ela" target="_blank">
+        <img src="https://github.com/Youssef-Abo-El-Ela.png" width="150px;" alt="Youssef Abo El Ela"/>
+        <br />
+        <sub><b>Youssef Abo El-Ela</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/karreemm" target="_blank">
+        <img src="https://github.com/karreemm.png" width="150px;" alt="Kareem Abdel Nabi"/>
+        <br />
+        <sub><b>Kareem Abdel Nabi</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/AhmedXAlDeeb" target="_blank">
+        <img src="https://github.com/AhmedXAlDeeb.png" width="150px;" alt="Ahmed X AlDeeb"/>
+        <br />
+        <sub><b>Ahmed AlDeeb</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
