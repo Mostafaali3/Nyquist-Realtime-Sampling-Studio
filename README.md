@@ -42,11 +42,11 @@ This project is a desktop application developed to demonstrate the principles of
 ## Setup Instructions
 #### Clone the repository
 ```bash
-git clone https://github.com/Mostafaali3/DSP-Sampling-Studio.git
+git clone https://github.com/Mostafaali3/Nyquist-Realtime-Sampling-Studio.git
 ```
 #### Navigate to project directory
 ```bash
-cd DSP-Sampling-Studio.git
+cd Nyquist-Realtime-Sampling-Studio
 ```
 
 #### Install required packages
