@@ -14,17 +14,20 @@ This project is a desktop application developed to demonstrate the principles of
 2. **Signal Mixer/Composer**:
    - Combine sinusoidal signals of different frequencies and amplitudes.
    - Add or remove components dynamically.
-![Video Demo](assets/mixing.gif)
+![Video Demo](assets/mixing%20(1).gif)
+[Watch the video](assets/mixing.mp4)
 3. **Noise Addition**:
    - Add controllable noise to the signal with a customizable SNR.
    - Visualize the effect of noise on signal frequency.
 ![Video Demo](assets/Noise_add.gif)
+[Watch the video](assets/Noise_add.mp4)
 4. **Real-Time Interaction**:
    - Changes in sampling frequency and reconstruction methods update the visualization in real time.
 
 5. **Reconstruction Methods**:
    - Explore multiple reconstruction techniques, including Whittaker–Shannon and alternatives, via a dropdown menu.
 ![Video Demo](assets/sampling_mehods.gif)
+[Watch the video](assets/sampling_mehods.mp4)
 6. **Multiple Graphs**:
    - View the original signal, reconstructed signal, error (difference), and frequency domain in a convenient layout.
 
