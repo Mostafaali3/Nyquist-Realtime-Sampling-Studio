@@ -1,5 +1,5 @@
 # Sampling-Theory Studio
-
+![Application Overview](icons_setup/icons/task_2_image.png "Overview of Sampling Studio")
 ## Overview
 This project is a desktop application developed to demonstrate the principles of signal sampling and recovery based on the Nyquist–Shannon sampling theorem. It helps users visualize, sample, and reconstruct signals using various methods, showcasing the impact of sampling frequency and noise on signal recovery.
 
@@ -14,17 +14,17 @@ This project is a desktop application developed to demonstrate the principles of
 2. **Signal Mixer/Composer**:
    - Combine sinusoidal signals of different frequencies and amplitudes.
    - Add or remove components dynamically.
-
+![Video Demo](assets/mixing.gif)
 3. **Noise Addition**:
    - Add controllable noise to the signal with a customizable SNR.
    - Visualize the effect of noise on signal frequency.
-
+![Video Demo](assets/Noise_add.gif)
 4. **Real-Time Interaction**:
    - Changes in sampling frequency and reconstruction methods update the visualization in real time.
 
 5. **Reconstruction Methods**:
    - Explore multiple reconstruction techniques, including Whittaker–Shannon and alternatives, via a dropdown menu.
-
+![Video Demo](assets/sampling_mehods.gif)
 6. **Multiple Graphs**:
    - View the original signal, reconstructed signal, error (difference), and frequency domain in a convenient layout.
 
@@ -36,25 +36,22 @@ This project is a desktop application developed to demonstrate the principles of
 
 ---
 
-## Requirements
-To run the application, ensure you have the following installed:
+## Setup Instructions
+#### Clone the repository
+```bash
+git clone https://github.com/Mostafaali3/DSP-Sampling-Studio.git
+```
+#### Navigate to project directory
+```bash
+cd DSP-Sampling-Studio.git
+```
 
-- Python 3.7 or later
-- Required libraries (install using the command below):
-  ```bash
-  pip install -r requirements.txt
+#### Install required packages
+```bash
+pip install -r requirements.txt
+```
 
-## Running the Application
-1. Clone this repository:
-   ```bash
-   git clone <repository-link>
-   cd <repository-folder>
-   
-2. Install dependencies:
-   ```bash
-    pip install -r requirements.txt
-
-3. Run the application:
-   ```bash
-   python main.py
-
+#### Run the application
+```bash
+python main.py
+```
