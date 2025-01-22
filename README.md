@@ -1,4 +1,5 @@
-# Sampling-Theory Studio
+# SampleLab-Nyquist-Realtime-Sampling-Studio
+
 ![Application Overview](icons_setup/icons/task_2_image.png "Overview of Sampling Studio")
 ## Overview
 This project is a desktop application developed to demonstrate the principles of signal sampling and recovery based on the Nyquist–Shannon sampling theorem. It helps users visualize, sample, and reconstruct signals using various methods, showcasing the impact of sampling frequency and noise on signal recovery.
@@ -110,3 +111,6 @@ python main.py
     </td>
   </tr>
 </table>
+
+## Acknowledgments
+These projects was supervised by Dr. Tamer Basha as part of the Digital Signal Processing course at Cairo University Faculty of Engineering.
